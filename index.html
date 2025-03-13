@@ -62,8 +62,9 @@
         }
     </style>
     <style>
-        .player1::after { content: "🚗"; font-size: 22px; position: absolute; transition: top 0.3s ease-in-out, left 0.3s ease-in-out;}
-        .player2::after { content: "🏍️"; font-size: 22px; position: absolute; transition: top 0.3s ease-in-out, left 0.3s ease-in-out;}
+        .player1::after { content: "🚗"; font-size: 22px; position: absolute; transition: top 0.3s ease-in-out, left 0.3s ease-in-out; }
+        .player2::after { content: "🏍️"; font-size: 22px; position: absolute; transition: top 0.3s ease-in-out, left 0.3s ease-in-out; }
+        .ai::after { content: "🤖"; font-size: 22px; position: absolute; transition: top 0.3s ease-in-out, left 0.3s ease-in-out; }
     </style>
     
 </head>
@@ -72,7 +73,9 @@
     <p><strong>Pemain:</strong> <span id="turn">1</span></p>
 
     <p id="totalDice">Total Dadu: 0</p>
-    <button id="rollDice">🎲 Lempar Dadu 🎲</button> 
+    <button id="pvpMode">👥 Player 1 vs Player 2</button><br><br>
+    <button id="vsComputer">🤖 Versus AI</button><br><br>
+    <button id="rollDice" style="display: none;">🎲 Lempar Dadu 🎲</button>
     <button id="resetGame" style="display: none; background-color: #4CAF50; color: white; font-size: 18px; padding: 10px 20px; border: none; border-radius: 10px; margin-top: 10px;">🔄 Reset Game</button>
 
     <p>Dadu: <span id="diceContainer">0, 0</span></p>
@@ -80,144 +83,166 @@
     <div class="board-container">
         <div class="board" id="board"></div>
     </div><br>
+
     <footer style="margin-top: 20px; font-size: 14px; color: #555;">
         © 2025 Amirul Putra Justicia - Snake 'n Ladder
     </footer>
-    
-    <script>
-        $(document).ready(function () {
-            const boardSize = 100;
-            const snakes = { 99: 54, 70: 55, 52: 29, 25: 2 };
-            const ladders = { 3: 22, 8: 26, 20: 41, 57: 83 };
-            let players = [1, 1];
-            let currentPlayer = 0;
-            
-            for (let i = boardSize; i > 0; i--) {
-                let cellClass = '';
-                
-                // Tambahkan ekor dan kepala ular
-                if (snakes[i]) {
-                    cellClass = 'snake-head';
-                } else if (Object.values(snakes).includes(i)) {
-                    cellClass = 'snake-tail';
-                }
-            
-                // Tambahkan tangga atas dan bawah
-                if (ladders[i]) {
-                    cellClass = 'ladder-bottom';
-                } else if (Object.values(ladders).includes(i)) {
-                    cellClass = 'ladder-top';
-                }
-            
-                $('#board').append(`<div class='cell ${cellClass}' id='cell${i}'>${i}</div>`);
-            }
-            
 
-            function animateMove(player, newPosition, steps) {
-                let stepIndex = 0;
+    <script>
+    $(document).ready(function () {
+        const boardSize = 100;
+        const snakes = { 99: 54, 70: 55, 52: 29, 25: 2 };
+        const ladders = { 3: 22, 8: 26, 20: 41, 57: 83 };
+        let players = [1, 1];
+        let currentPlayer = 0;
+        let isVsComputer = false;
+
+        for (let i = boardSize; i > 0; i--) {
+            let cellClass = '';
+
+            if (snakes[i]) cellClass = 'snake-head';
+            else if (Object.values(snakes).includes(i)) cellClass = 'snake-tail';
+
+            if (ladders[i]) cellClass = 'ladder-bottom';
+            else if (Object.values(ladders).includes(i)) cellClass = 'ladder-top';
+
+            $('#board').append(`<div class='cell ${cellClass}' id='cell${i}'>${i}</div>`);
+        }
+
+        function animateMove(player, newPosition, steps) {
+            let stepIndex = 0;
             
-                function step() {
-                    if (stepIndex < steps.length) {
-                        $('.cell').removeClass(`player${player + 1}`);
-                        players[player] = steps[stepIndex];
-                        let playerElement = $(`#cell${players[player]}`);
-            
-                        // Animasi pergerakan pemain
-                        playerElement.addClass(`player${player + 1}`);
-                        playerElement.animate({ opacity: 0.5 }, 150).animate({ opacity: 1 }, 150);
-            
-                        stepIndex++;
-                        setTimeout(step, 300); // Waktu antar langkah pergerakan
-                    } else {
-                        players[player] = newPosition;
-                        $('.cell').removeClass(`player${player + 1}`);
-                        $(`#cell${players[player]}`).addClass(`player${player + 1}`);
-            
-                        if (players[player] >= boardSize) {
-                            setTimeout(() => {
-                                Swal.fire({
-                                    title: `🎉 Pemain ${player + 1} Menang! 🎊`,
-                                    text: "Selamat! Anda telah mencapai kotak terakhir.",
-                                    icon: "success",
-                                    confirmButtonText: "OK"
-                                }).then(() => {
-                                    $('#rollDice').prop("disabled", true);
-                                });
-                            }, 500);
-                        }
+            function step() {
+                if (stepIndex < steps.length) {
+                    players[player] = steps[stepIndex];
+                    updatePlayerIcon(player);
+                    stepIndex++;
+                    setTimeout(step, 300);
+                } else {
+                    players[player] = newPosition;
+                    updatePlayerIcon(player);
+                    
+                    if (players[player] >= boardSize) {
+                        setTimeout(() => {
+                            Swal.fire({
+                                title: `🎉 ${isVsComputer && player === 1 ? "AI Computer" : "Pemain " + (player + 1)} Menang! 🎊`,
+                                text: "Selamat! Anda telah mencapai kotak terakhir.",
+                                icon: "success",
+                                confirmButtonText: "OK"
+                            }).then(() => {
+                                $('#rollDice').prop("disabled", true);
+                            });
+                        }, 500);
                     }
                 }
-                step();
             }
-            
+            step();
+        }
+        
 
-            function movePlayer(player, diceValue) {
-                let newPosition = players[player] + diceValue;
-                if (newPosition > boardSize) return;
-            
-                let steps = [];
-                for (let i = players[player] + 1; i <= newPosition; i++) {
-                    steps.push(i);
-                }
-            
-                let finalPosition = newPosition;
-                if (snakes[newPosition]) {
-                    finalPosition = snakes[newPosition];
-                    Swal.fire({
-                        title: "🐍 Oops! Digigit Ular!",
-                        text: `Pemain ${player + 1} turun ke kotak ${finalPosition}.`,
-                        icon: "warning",
-                        confirmButtonText: "OK"
-                    });
-                } else if (ladders[newPosition]) {
-                    finalPosition = ladders[newPosition];
-                    Swal.fire({
-                        title: "🪜 Yeay! Naik Tangga!",
-                        text: `Pemain ${player + 1} naik ke kotak ${finalPosition}.`,
-                        icon: "success",
-                        confirmButtonText: "OK"
-                    });
-                }
-            
-                animateMove(player, finalPosition, steps);
+        function movePlayer(player, diceValue) {
+            let newPosition = players[player] + diceValue;
+            if (newPosition > boardSize) return;
+
+            let steps = [];
+            for (let i = players[player] + 1; i <= newPosition; i++) {
+                steps.push(i);
             }
-            
-            
-            $('#rollDice').click(function () {
-                let dice1 = Math.floor(Math.random() * 6) + 1;
-                let dice2 = Math.floor(Math.random() * 6) + 1;
-                let diceTotal = dice1 + dice2;
 
-                $('#diceContainer').text(`${dice1}, ${dice2}`);
-                $('#totalDice').text(`Total Dadu: ${diceTotal}`);
+            let finalPosition = newPosition;
+            if (snakes[newPosition]) {
+                finalPosition = snakes[newPosition];
+                Swal.fire({
+                    title: "🐍 Oops! Digigit Ular!",
+                    text: `Pemain ${player + 1} turun ke kotak ${finalPosition}.`,
+                    icon: "warning",
+                    confirmButtonText: "OK"
+                });
+            } else if (ladders[newPosition]) {
+                finalPosition = ladders[newPosition];
+                Swal.fire({
+                    title: "🪜 Yeay! Naik Tangga!",
+                    text: `Pemain ${player + 1} naik ke kotak ${finalPosition}.`,
+                    icon: "success",
+                    confirmButtonText: "OK"
+                });
+            }
 
-                movePlayer(currentPlayer, diceTotal);
-                
-                if (players[currentPlayer] < boardSize) {
-                    currentPlayer = 1 - currentPlayer;
-                    $('#turn').text(currentPlayer + 1);
+            animateMove(player, finalPosition, steps);
+        }
+
+        function rollDiceAndMove() {
+            let dice1 = Math.floor(Math.random() * 6) + 1;
+            let dice2 = Math.floor(Math.random() * 6) + 1;
+            let diceTotal = dice1 + dice2;
+
+            $('#diceContainer').text(`${dice1}, ${dice2}`);
+            $('#totalDice').text(`Total Dadu: ${diceTotal}`);
+
+            movePlayer(currentPlayer, diceTotal);
+
+            if (players[currentPlayer] < boardSize) {
+                currentPlayer = 1 - currentPlayer;
+                $('#turn').text(currentPlayer + 1);
+
+                if (isVsComputer && currentPlayer === 1) {
+                    setTimeout(rollDiceAndMove, 1000);
                 }
-            });
-            $('#resetGame').show(); // Tampilkan tombol reset
-            $('#resetGame').click(function () {
-                players = [1, 1];
-                currentPlayer = 0;
-                
-                // Reset tampilan papan
-                $('.cell').removeClass('player1 player2');
-                $('#cell1').addClass('player1 player2');
-                
-                // Reset teks di UI
-                $('#turn').text('1');
-                $('#totalDice').text('Total Dadu: 0');
-                $('#diceContainer').text('0, 0');
-                
-                // Aktifkan tombol "Lempar Dadu" dan tampilkan "Reset Game"
-                $('#rollDice').prop("disabled", false);
-                $('#resetGame').show();
-            });
-            
+            }
+        }
+
+        function updatePlayerIcon(player) {
+            $('.cell').removeClass(`player${player + 1}`).removeClass('ai');
+            let playerElement = $(`#cell${players[player]}`);
+        
+            if (isVsComputer && player === 1) {
+                playerElement.addClass('ai'); // Gunakan ikon AI
+            } else {
+                playerElement.addClass(`player${player + 1}`);
+            }
+        }
+        
+
+        $('#pvpMode').click(function () {
+            isVsComputer = false;
+            $('#rollDice').show();
+            $('#resetGame').show();
+            $('#pvpMode').prop("disabled", true);
+            $('#vsComputer').prop("disabled", true);
         });
+
+        $('#vsComputer').click(function () {
+            isVsComputer = true;
+            $('#rollDice').show();
+            $('#resetGame').show();
+            $('#pvpMode').prop("disabled", true);
+            $('#vsComputer').prop("disabled", true);
+        });
+
+        $('#rollDice').click(function () {
+            rollDiceAndMove();
+        });
+
+        $('#resetGame').click(function () {
+            players = [1, 1];
+            currentPlayer = 0;
+            isVsComputer = false;
+
+            $('.cell').removeClass('player1 player2');
+            $('#cell1').addClass('player1 player2');
+
+            $('#turn').text('1');
+            $('#totalDice').text('Total Dadu: 0');
+            $('#diceContainer').text('0, 0');
+
+            $('#rollDice').prop("disabled", false).hide();
+            $('#pvpMode').prop("disabled", false);
+            $('#vsComputer').prop("disabled", false);
+            $('#resetGame').hide();
+        });
+
+    });
     </script>
+
 </body>
 </html>
