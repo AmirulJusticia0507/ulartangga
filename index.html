@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Ular Tangga</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background-color: #f5f5f5; }
+        .board-container { display: flex; justify-content: center; align-items: center; }
+        .board { display: grid; grid-template-columns: repeat(10, 50px); gap: 2px; margin: 20px auto; background-color: white; padding: 10px; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); }
+        .cell { width: 50px; height: 50px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; font-weight: bold; position: relative; background-color: #fff; }
+        .player1 { color: red; font-size: 20px; }
+        .player2 { color: blue; font-size: 20px; }
+        .snake-head::after { content: "🐍"; font-size: 35px; position: absolute; top: 2px; left: 2px; }
+        .snake-tail::after { content: "🔽"; font-size: 25px; position: absolute; bottom: 2px; right: 2px; color: red; }
+        .ladder-bottom::after { content: "🪜"; font-size: 35px; position: absolute; bottom: 2px; left: 2px; color: green; }
+        .ladder-top::after { content: "🔼"; font-size: 25px; position: absolute; top: 2px; right: 2px; color: green; }
+
+        #rollDice { 
+            background-color: #ff5722; 
+            color: white; 
+            font-size: 18px; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 10px;
+            transition: transform 0.2s ease-in-out;
+        }
+        #rollDice:hover {
+            background-color: #e64a19;
+            transform: scale(1.1);
+        }
+        #diceContainer {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+        #totalDice {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+    </style>
+    <style>
+        .player1::after { content: "🚗"; font-size: 22px; position: absolute; }
+        .player2::after { content: "🏍️"; font-size: 22px; position: absolute; }
+    </style>
+    
+</head>
+<body>
+    <h2>Game Ular Tangga</h2>
+    <p><strong>Pemain:</strong> <span id="turn">1</span></p>
+
+    <p id="totalDice">Total Dadu: 0</p>
+    <button id="rollDice">🎲 Lempar Dadu 🎲</button>
+    <p>Dadu: <span id="diceContainer">0, 0</span></p>
+
+    <div class="board-container">
+        <div class="board" id="board"></div>
+    </div><br>
+    <footer style="margin-top: 20px; font-size: 14px; color: #555;">
+        © 2025 Amirul Putra Justicia - Snake 'n Ladder
+    </footer>
+    
+    <script>
+        $(document).ready(function () {
+            const boardSize = 100;
+            const snakes = { 99: 54, 70: 55, 52: 29, 25: 2 };
+            const ladders = { 3: 22, 8: 26, 20: 41, 57: 83 };
+            let players = [1, 1];
+            let currentPlayer = 0;
+            
+            for (let i = boardSize; i > 0; i--) {
+                let cellClass = '';
+                
+                // Tambahkan ekor dan kepala ular
+                if (snakes[i]) {
+                    cellClass = 'snake-head';
+                } else if (Object.values(snakes).includes(i)) {
+                    cellClass = 'snake-tail';
+                }
+
+                // Tambahkan tangga atas dan bawah
+                if (ladders[i]) {
+                    cellClass = 'ladder-bottom';
+                } else if (Object.values(ladders).includes(i)) {
+                    cellClass = 'ladder-top';
+                }
+
+                $('#board').append(`<div class='cell ${cellClass}' id='cell${i}'>${i}</div>`);
+            }
+
+            function animateMove(player, newPosition, steps) {
+                let stepIndex = 0;
+
+                function step() {
+                    if (stepIndex < steps.length) {
+                        $('.cell').removeClass(`player${player + 1}`);
+                        players[player] = steps[stepIndex];
+                        $(`#cell${players[player]}`).addClass(`player${player + 1}`);
+                        stepIndex++;
+                        setTimeout(step, 300);
+                    } else {
+                        players[player] = newPosition;
+                        $('.cell').removeClass(`player${player + 1}`);
+                        $(`#cell${players[player]}`).addClass(`player${player + 1}`);
+
+                        if (players[player] >= boardSize) {
+                            setTimeout(() => {
+                                Swal.fire({
+                                    title: `🎉 Pemain ${player + 1} Menang! 🎊`,
+                                    text: "Selamat! Anda telah mencapai kotak terakhir.",
+                                    icon: "success",
+                                    confirmButtonText: "OK"
+                                }).then(() => {
+                                    $('#rollDice').prop("disabled", true);
+                                });
+                            }, 500);
+                        }
+                    }
+                }
+                step();
+            }
+
+            function movePlayer(player, diceValue) {
+                let newPosition = players[player] + diceValue;
+                if (newPosition > boardSize) return;
+
+                let steps = [];
+                for (let i = players[player] + 1; i <= newPosition; i++) {
+                    steps.push(i);
+                }
+
+                newPosition = snakes[newPosition] || ladders[newPosition] || newPosition;
+                animateMove(player, newPosition, steps);
+            }
+            
+            $('#rollDice').click(function () {
+                let dice1 = Math.floor(Math.random() * 6) + 1;
+                let dice2 = Math.floor(Math.random() * 6) + 1;
+                let diceTotal = dice1 + dice2;
+
+                $('#diceContainer').text(`${dice1}, ${dice2}`);
+                $('#totalDice').text(`Total Dadu: ${diceTotal}`);
+
+                movePlayer(currentPlayer, diceTotal);
+                
+                if (players[currentPlayer] < boardSize) {
+                    currentPlayer = 1 - currentPlayer;
+                    $('#turn').text(currentPlayer + 1);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
