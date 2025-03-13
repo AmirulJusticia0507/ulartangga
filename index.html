@@ -19,7 +19,24 @@
         .snake-tail::after { content: "🔽"; font-size: 25px; position: absolute; bottom: 2px; right: 2px; color: red; }
         .ladder-bottom::after { content: "🪜"; font-size: 35px; position: absolute; bottom: 2px; left: 2px; color: green; }
         .ladder-top::after { content: "🔼"; font-size: 25px; position: absolute; top: 2px; right: 2px; color: green; }
-
+        .cell:nth-child(even) {
+            background-color: #e0f7fa; /* Biru muda */
+        }
+        
+        .cell:nth-child(odd) {
+            background-color: #ffebee; /* Merah muda */
+        }
+        
+        .snake-head {
+            background-color: #ff7043 !important; /* Oranye */
+            color: white;
+        }
+        
+        .ladder-bottom {
+            background-color: #66bb6a !important; /* Hijau */
+            color: white;
+        }
+        
         #rollDice { 
             background-color: #ff5722; 
             color: white; 
@@ -84,16 +101,17 @@
                 } else if (Object.values(snakes).includes(i)) {
                     cellClass = 'snake-tail';
                 }
-
+            
                 // Tambahkan tangga atas dan bawah
                 if (ladders[i]) {
                     cellClass = 'ladder-bottom';
                 } else if (Object.values(ladders).includes(i)) {
                     cellClass = 'ladder-top';
                 }
-
+            
                 $('#board').append(`<div class='cell ${cellClass}' id='cell${i}'>${i}</div>`);
             }
+            
 
             function animateMove(player, newPosition, steps) {
                 let stepIndex = 0;
