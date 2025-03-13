@@ -36,6 +36,26 @@
             background-color: #66bb6a !important; /* Hijau */
             color: white;
         }
+
+        .game-container {
+            display: flex; 
+            justify-content: center; /* Posisikan di tengah */
+            align-items: flex-start; /* Rata atas */
+            gap: 20px; /* Jarak antar elemen */
+        }
+        
+        .board-container {
+            flex-shrink: 0; /* Agar papan tidak mengecil */
+        }
+        
+        #leaderboard {
+            width: 200px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
         
         #rollDice { 
             background-color: #ff5722; 
@@ -80,9 +100,17 @@
 
     <p>Dadu: <span id="diceContainer">0, 0</span></p>
 
-    <div class="board-container">
-        <div class="board" id="board"></div>
-    </div><br>
+    <div class="game-container">
+        <div class="board-container">
+            <div class="board" id="board"></div>
+        </div>
+    
+        <div id="leaderboard">
+            <h4>🏆 Leaderboard</h4>
+            <ol id="leaderboardList"></ol>
+        </div>
+    </div>
+    
 
     <footer style="margin-top: 20px; font-size: 14px; color: #555;">
         © 2025 Amirul Putra Justicia - Snake 'n Ladder
@@ -169,6 +197,7 @@
             }
 
             animateMove(player, finalPosition, steps);
+            updateLeaderboard();
         }
 
         function rollDiceAndMove() {
@@ -201,7 +230,15 @@
                 playerElement.addClass(`player${player + 1}`);
             }
         }
-        
+
+        function updateLeaderboard() {
+                let rankings = players.map((pos, index) => ({ player: index + 1, position: pos }))
+                    .sort((a, b) => b.position - a.position); // Urutkan dari posisi tertinggi ke terendah
+            
+                let leaderboardHTML = rankings.map(entry => `<li>🚀 Pemain ${entry.player} - Kotak ${entry.position}</li>`).join("");
+            
+                $("#leaderboardList").html(leaderboardHTML);
+        }
 
         $('#pvpMode').click(function () {
             isVsComputer = false;
