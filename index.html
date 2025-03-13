@@ -55,7 +55,9 @@
     <p><strong>Pemain:</strong> <span id="turn">1</span></p>
 
     <p id="totalDice">Total Dadu: 0</p>
-    <button id="rollDice">🎲 Lempar Dadu 🎲</button>
+    <button id="rollDice">🎲 Lempar Dadu 🎲</button> 
+    <button id="resetGame" style="display: none; background-color: #4CAF50; color: white; font-size: 18px; padding: 10px 20px; border: none; border-radius: 10px; margin-top: 10px;">🔄 Reset Game</button>
+
     <p>Dadu: <span id="diceContainer">0, 0</span></p>
 
     <div class="board-container">
@@ -152,6 +154,19 @@
                     currentPlayer = 1 - currentPlayer;
                     $('#turn').text(currentPlayer + 1);
                 }
+            });
+            $('#resetGame').show(); // Tampilkan tombol reset
+            $('#resetGame').click(function () {
+                players = [1, 1];
+                currentPlayer = 0;
+                $('.cell').removeClass('player1 player2');
+                $('#cell1').addClass('player1');
+                $('#cell1').addClass('player2');
+                $('#turn').text('1');
+                $('#totalDice').text('Total Dadu: 0');
+                $('#diceContainer').text('0, 0');
+                $('#rollDice').prop("disabled", false);
+                $(this).hide(); // Sembunyikan tombol reset setelah di klik
             });
         });
     </script>
