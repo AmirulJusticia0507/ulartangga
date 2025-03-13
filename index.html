@@ -202,15 +202,21 @@
             $('#resetGame').click(function () {
                 players = [1, 1];
                 currentPlayer = 0;
+                
+                // Reset tampilan papan
                 $('.cell').removeClass('player1 player2');
-                $('#cell1').addClass('player1');
-                $('#cell1').addClass('player2');
+                $('#cell1').addClass('player1 player2');
+                
+                // Reset teks di UI
                 $('#turn').text('1');
                 $('#totalDice').text('Total Dadu: 0');
                 $('#diceContainer').text('0, 0');
+                
+                // Aktifkan tombol "Lempar Dadu" dan tampilkan "Reset Game"
                 $('#rollDice').prop("disabled", false);
-                $(this).hide(); // Sembunyikan tombol reset setelah di klik
+                $('#resetGame').show();
             });
+            
         });
     </script>
 </body>
