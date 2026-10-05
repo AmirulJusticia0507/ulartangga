@@ -4,6 +4,21 @@
  */
 
 /**
+ * Dapatkan tooltip text untuk cell
+ */
+function getCellTooltip(n) {
+  if (n === 1) return 'Mulai dari sini!';
+  if (n === CONFIG.BOARD_SIZE) return 'Finish! Kotak Tujuan!';
+  if (CONFIG.SNAKES[n]) {
+    return `🐍 Ular! Mundur ke ${CONFIG.SNAKES[n]}`;
+  }
+  if (CONFIG.LADDERS[n]) {
+    return `🪜 Tangga! Naik ke ${CONFIG.LADDERS[n]}`;
+  }
+  return null;
+}
+
+/**
  * Bangun struktur HTML papan (grid 10x10 dengan zigzag pattern)
  */
 function buildBoard() {
@@ -16,7 +31,9 @@ function buildBoard() {
       if (row % 2 === 1) classes.push('alt');
       if (n === 1) classes.push('start-cell');
       if (n === CONFIG.BOARD_SIZE) classes.push('goal-cell');
-      html += `<div class="cell ${classes.join(' ').trim()}" id="cell${n}" role="gridcell"><span class="cell__num">${n}</span></div>`;
+      const tooltip = getCellTooltip(n);
+      const tooltipAttr = tooltip ? ` title="${tooltip}"` : '';
+      html += `<div class="cell ${classes.join(' ').trim()}" id="cell${n}" role="gridcell"${tooltipAttr}><span class="cell__num">${n}</span></div>`;
     }
   }
   DOM.$board.html(html);

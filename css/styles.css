@@ -306,7 +306,57 @@ button { font-family: inherit; }
   font-weight: 600;
   color: var(--cell-num);
   transition: background .25s ease, transform .25s var(--ease), box-shadow .25s ease;
+  cursor: help;
 }
+
+/* Tooltip styling */
+.cell[title] {
+  position: relative;
+}
+
+.cell[title]::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%) scale(0.8);
+  opacity: 0;
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--text) 95%, transparent);
+  color: var(--bg);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity .2s ease, transform .2s var(--ease);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, .3);
+}
+
+.cell[title]::before {
+  content: '';
+  position: absolute;
+  bottom: 102%;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid color-mix(in srgb, var(--text) 95%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity .2s ease, transform .2s var(--ease);
+}
+
+.cell[title]:hover::after,
+.cell[title]:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
 .cell.alt { background: var(--cell-b); }
 .cell.start-cell, .cell.goal-cell { color: var(--text); }
 .cell.goal-cell {
