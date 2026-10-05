@@ -5,18 +5,15 @@
 
 /**
  * Finalisasi gerakan pemain (setelah animasi dan event selesai)
+ * trap = null | { type: 'snake'|'ladder' } untuk menampilkan modal setelah animasi
  */
-function finishMovement(player, finalPosition) {
+function finishMovement(player, finalPosition, trap) {
   STATE.players[player] = finalPosition;
-  renderTokens();
-  updateLeaderboard();
 
   if (finalPosition >= CONFIG.BOARD_SIZE) {
     STATE.gameOver = true;
     STATE.busy = false;
-    renderPlayers();
-    renderTurn();
-    renderControls();
+    render();
     addLog('🏆', `<strong>${playerName(player)}</strong> menang!`, '100', 'win');
     celebrate();
     Swal.fire({
@@ -29,23 +26,52 @@ function finishMovement(player, finalPosition) {
     return;
   }
 
+  if (trap) {
+    const isSnake = trap.type === 'snake';
+    // segarkan sidebar agar posisi di kartu sudah sesuai saat modal tampil
+    renderPlayers();
+    renderLeaderboard();
+    Swal.fire({
+      customClass: { popup: 'swal-popup', confirmButton: 'swal-confirm' },
+      title: isSnake ? '🐍 Oops! Digigit Ular!' : '🪜 Yeay! Naik Tangga!',
+      html: `<p style="margin:6px 0 0;color:var(--muted)">${playerName(player)} ${isSnake ? 'turun' : 'naik'} ke kotak <b>${finalPosition}</b>.</p>`,
+      icon: isSnake ? 'warning' : 'success',
+      confirmButtonText: 'Lanjut'
+    }).then(() => { STATE.busy = false; nextTurn(); });
+    return;
+  }
+
   STATE.busy = false;
   nextTurn();
 }
 
 /**
  * Animasikan gerakan pemain step-by-step
+ * Jika terkena ular/tangga, tambahkan slide cepat ke kotak tujuan
  */
-function animateMove(player, finalPosition, steps) {
+function animateMove(player, finalPosition, steps, trap) {
+  const path = steps.slice();
+  const delay = STATE.reduceMotion ? 20 : CONFIG.STEP_MS;
+
+  if (trap) {
+    const from = steps.length ? steps[steps.length - 1] : STATE.players[player];
+    const segs = 5;
+    for (let i = 1; i <= segs; i++) {
+      path.push(Math.round(from + (finalPosition - from) * (i / segs)));
+    }
+  }
+
   let i = 0;
   const advance = () => {
-    if (i < steps.length) {
-      STATE.players[player] = steps[i];
-      renderTokens();
+    if (i < path.length) {
+      STATE.players[player] = path[i];
       i++;
-      setTimeout(advance, STATE.reduceMotion ? 20 : CONFIG.STEP_MS);
+      renderTokens();
+      setTimeout(advance, trap ? Math.round(delay * 0.28) : delay);
     } else {
-      finishMovement(player, finalPosition);
+      STATE.players[player] = finalPosition;
+      renderTokens();
+      finishMovement(player, finalPosition, trap);
     }
   };
   advance();
@@ -55,46 +81,34 @@ function animateMove(player, finalPosition, steps) {
  * Pindahkan pemain berdasarkan hasil dadu
  */
 function movePlayer(player, total) {
-  const target = STATE.players[player] + total;
+  const from = STATE.players[player];
+  const target = from + total;
 
   if (target > CONFIG.BOARD_SIZE) {
-    toast(`⚠️ Melewati kotak 100 — ${playerName(player)} tetap di kotak ${STATE.players[player]}`);
-    addLog('⚠️', `<strong>${playerName(player)}</strong> melebihi 100`, `${STATE.players[player]}`, 'skip');
-    finishMovement(player, STATE.players[player]);
+    toast(`⚠️ Melewati kotak 100 — ${playerName(player)} tetap di kotak ${from}`);
+    addLog('⚠️', `<strong>${playerName(player)}</strong> melebihi 100`, String(from), 'skip');
+    STATE.busy = false;
+    nextTurn();
     return;
   }
 
   const steps = [];
-  for (let i = STATE.players[player] + 1; i <= target; i++) steps.push(i);
+  for (let i = from + 1; i <= target; i++) steps.push(i);
 
   DOM.$cell(target).addClass('landing');
   setTimeout(() => DOM.$cell(target).removeClass('landing'), 520);
 
   if (CONFIG.SNAKES[target]) {
     const dest = CONFIG.SNAKES[target];
-    addLog('🐍', `<strong>${playerName(player)}</strong> digigit ular`, `${STATE.players[player]} → ${dest}`, 'snake');
-    setTimeout(() => animateMove(player, dest, steps), STATE.reduceMotion ? 30 : 420);
-    Swal.fire({
-      customClass: { popup: 'swal-popup', confirmButton: 'swal-confirm' },
-      title: '🐍 Oops! Digigit Ular!',
-      html: `<p style="margin:6px 0 0;color:var(--muted)">${playerName(player)} turun ke kotak <b>${dest}</b>.</p>`,
-      icon: 'warning',
-      confirmButtonText: 'Lanjut'
-    });
+    addLog('🐍', `<strong>${playerName(player)}</strong> digigit ular`, `${target} → ${dest}`, 'snake');
+    animateMove(player, dest, steps, { type: 'snake' });
   } else if (CONFIG.LADDERS[target]) {
     const dest = CONFIG.LADDERS[target];
-    addLog('🪜', `<strong>${playerName(player)}</strong> naik tangga`, `${STATE.players[player]} → ${dest}`, 'ladder');
-    setTimeout(() => animateMove(player, dest, steps), STATE.reduceMotion ? 30 : 420);
-    Swal.fire({
-      customClass: { popup: 'swal-popup', confirmButton: 'swal-confirm' },
-      title: '🪜 Yeay! Naik Tangga!',
-      html: `<p style="margin:6px 0 0;color:var(--muted)">${playerName(player)} naik ke kotak <b>${dest}</b>.</p>`,
-      icon: 'success',
-      confirmButtonText: 'Lanjut'
-    });
+    addLog('🪜', `<strong>${playerName(player)}</strong> naik tangga`, `${target} → ${dest}`, 'ladder');
+    animateMove(player, dest, steps, { type: 'ladder' });
   } else {
     addLog(playerIcon(player), `<strong>${playerName(player)}</strong> melangkah`, String(target), 'step');
-    animateMove(player, target, steps);
+    animateMove(player, target, steps, null);
   }
 }
 

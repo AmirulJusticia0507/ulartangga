@@ -116,10 +116,3 @@ function render() {
   highlightActiveCell();
   renderControls();
 }
-
-/**
- * Alias untuk renderLeaderboard (dipanggil setelah movement)
- */
-function updateLeaderboard() {
-  renderLeaderboard();
-}

@@ -32,7 +32,7 @@ function buildBoard() {
       if (n === 1) classes.push('start-cell');
       if (n === CONFIG.BOARD_SIZE) classes.push('goal-cell');
       const tooltip = getCellTooltip(n);
-      const tooltipAttr = tooltip ? ` title="${tooltip}"` : '';
+      const tooltipAttr = tooltip ? ` data-tip="${tooltip}"` : '';
       html += `<div class="cell ${classes.join(' ').trim()}" id="cell${n}" role="gridcell"${tooltipAttr}><span class="cell__num">${n}</span></div>`;
     }
   }

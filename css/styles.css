@@ -18,7 +18,8 @@
   --radius: 18px;
   --radius-lg: 26px;
 
-  --cell: clamp(26px, 5.4vw, 52px);
+  /* --cell-max = batas atas ukuran sel; sel nyata ikut lebar container (1fr) */
+  --cell-max: 64px;
   --gap: clamp(2px, .45vw, 5px);
   --step-ms: 260ms;
 
@@ -83,14 +84,15 @@ body {
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow-x: clip;
   transition: background .4s ease, color .4s ease;
 }
 
 body::before {
   content: '';
   position: fixed;
-  inset: -30%;
+  /* inset 0 (bukan -30%) supaya tidak menambah scroll width halaman */
+  inset: 0;
   z-index: -1;
   background:
     radial-gradient(38vw 38vw at 12% 8%,  var(--bg-glow-1), transparent 60%),
@@ -178,6 +180,14 @@ button { font-family: inherit; }
 
 @media (max-width: 980px) {
   .layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* header jangan wrap di layar sempit */
+@media (max-width: 480px) {
+  .app-header { flex-wrap: nowrap; }
+  .brand { min-width: 0; }
+  .brand__sub { display: none; }
+  .brand__mark { width: 46px; height: 46px; font-size: 23px; }
 }
 
 .card {
@@ -279,7 +289,8 @@ button { font-family: inherit; }
 
 .board-wrap {
   position: relative;
-  width: min(100%, calc(var(--cell) * 10 + var(--gap) * 9));
+  /* 10 kolom + 9 gap + 2 padding + 2 border, dibatasi ukuran sel maksimum */
+  width: min(100%, calc(var(--cell-max) * 10 + var(--gap) * 11 + 2px));
   margin-inline: auto;
 }
 
@@ -287,8 +298,10 @@ button { font-family: inherit; }
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(10, var(--cell));
-  grid-auto-rows: var(--cell);
+  /* 1fr + aspect-ratio: papan selalu persegi & ikut container, tidak pernah overflow */
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  grid-template-rows: repeat(10, minmax(0, 1fr));
+  aspect-ratio: 1;
   gap: var(--gap);
   padding: var(--gap);
   border-radius: var(--radius);
@@ -309,52 +322,59 @@ button { font-family: inherit; }
   cursor: help;
 }
 
-/* Tooltip styling */
-.cell[title] {
-  position: relative;
-}
+/* Tooltip styling - hanya di perangkat yang mendukung hover.
+   Pakai display:none saat tidak hovered supaya tidak menambah scroll width. */
+@media (hover: hover) {
+  .cell[data-tip] {
+    position: relative;
+  }
 
-.cell[title]::after {
-  content: attr(title);
-  position: absolute;
-  bottom: 110%;
-  left: 50%;
-  transform: translateX(-50%) scale(0.8);
-  opacity: 0;
-  padding: 8px 12px;
-  background: color-mix(in srgb, var(--text) 95%, transparent);
-  color: var(--bg);
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 10;
-  transition: opacity .2s ease, transform .2s var(--ease);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, .3);
-}
+  .cell[data-tip]::after {
+    content: attr(data-tip);
+    display: none;
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    padding: 8px 12px;
+    background: color-mix(in srgb, var(--text) 95%, transparent);
+    color: var(--bg);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, .3);
+  }
 
-.cell[title]::before {
-  content: '';
-  position: absolute;
-  bottom: 102%;
-  left: 50%;
-  transform: translateX(-50%) scale(0);
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 6px solid color-mix(in srgb, var(--text) 95%, transparent);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 10;
-  transition: opacity .2s ease, transform .2s var(--ease);
-}
+  .cell[data-tip]::before {
+    content: '';
+    display: none;
+    position: absolute;
+    bottom: 102%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid color-mix(in srgb, var(--text) 95%, transparent);
+    pointer-events: none;
+    z-index: 10;
+  }
 
-.cell[title]:hover::after,
-.cell[title]:hover::before {
-  opacity: 1;
-  transform: translateX(-50%) scale(1);
+  .cell[data-tip]:hover::after {
+    display: block;
+    animation: tip-in .18s var(--ease-out) both;
+  }
+  .cell[data-tip]:hover::before {
+    display: block;
+    animation: tip-in .18s var(--ease-out) both;
+  }
+
+  @keyframes tip-in {
+    from { opacity: 0; transform: translateX(-50%) scale(.85); }
+    to   { opacity: 1; transform: translateX(-50%) scale(1); }
+  }
 }
 
 .cell.alt { background: var(--cell-b); }
@@ -367,7 +387,14 @@ button { font-family: inherit; }
 .cell.goal-cell .cell__num { color: #4a2c05; }
 .cell.start-cell { box-shadow: inset 0 0 0 1px var(--border-strong); }
 
-.cell__num { position: relative; z-index: 1; line-height: 1; }
+/* nomor sel selalu di atas ilustrasi ular & tangga */
+.cell__num {
+  position: relative;
+  z-index: 3;
+  line-height: 1;
+  text-shadow: 0 1px 4px color-mix(in srgb, var(--bg) 85%, transparent);
+}
+html[data-theme="light"] .cell__num { text-shadow: 0 1px 4px rgba(255, 255, 255, .95); }
 
 .cell.snake-head { background: color-mix(in srgb, var(--green-a) 26%, var(--cell-a)); }
 .cell.snake-tail { background: color-mix(in srgb, var(--green-a) 15%, var(--cell-a)); }
@@ -386,13 +413,14 @@ button { font-family: inherit; }
   100% { transform: scale(1); }
 }
 
-/* overlay: ular & tangga */
+/* overlay: ular & tangga (di atas papan, tapi di bawah nomor sel) */
 .board-links, .board-decor {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 2;
 }
+.board-decor { overflow: clip; }
 .board-decor > * { position: absolute; background-repeat: no-repeat; background-position: center; background-size: contain; }
 .snake-img { background-image: url('../ular.png'); }
 .ladder-img { background-image: url('../tangga.png'); }
@@ -404,7 +432,7 @@ button { font-family: inherit; }
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: calc(var(--cell) * .42);
+  font-size: clamp(11px, 2.2vw, 26px);
   line-height: 1;
   z-index: 3;
   border: 2px solid color-mix(in srgb, #fff 45%, transparent);
@@ -537,12 +565,19 @@ html[data-theme="light"] .token { border-color: rgba(255, 255, 255, .85); }
 .dice-pair { display: flex; gap: 10px; }
 
 .die {
-  width: clamp(46px, 8vw, 58px);
+  --die: clamp(46px, 8vw, 58px);
+  width: var(--die);
   aspect-ratio: 1;
   display: grid;
-  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
-  gap: 4px;
-  padding: 7px;
+  /* named areas wajib ada, jika tidak semua pip menumpuk di satu track */
+  grid-template-areas:
+    "tl t tr"
+    "l  c r"
+    "bl b br";
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 3px;
+  padding: 6px;
   border-radius: 14px;
   background: linear-gradient(150deg, #fff, #dfe4f5);
   box-shadow: 0 10px 20px -10px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(255, 255, 255, .7);
@@ -552,10 +587,9 @@ html[data-theme="dark"] .die { background: linear-gradient(150deg, #2a3358, #1a2
 .pip {
   border-radius: 50%;
   background: color-mix(in srgb, var(--text) 82%, transparent);
-  align-self: center;
-  justify-self: center;
-  width: 62%;
-  height: 62%;
+  place-self: center;
+  width: calc(var(--die) * .17);
+  height: calc(var(--die) * .17);
 }
 .die.is-idle .pip { opacity: .18; }
 
@@ -595,10 +629,11 @@ html[data-theme="dark"] .die { background: linear-gradient(150deg, #2a3358, #1a2
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  padding: 14px 20px;
+  gap: 8px;
+  padding: 14px 16px;
   font-size: 15px;
   font-weight: 700;
+  white-space: nowrap;
   color: #fff;
   border: 0;
   border-radius: var(--radius);
@@ -714,10 +749,11 @@ html[data-theme="dark"] .die { background: linear-gradient(150deg, #2a3358, #1a2
   border: 1px solid var(--border-strong);
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(14px);
-  transition: transform .38s var(--ease);
+  transition: transform .38s var(--ease), visibility .38s;
+  visibility: hidden;
   pointer-events: none;
 }
-.toast.show { transform: translate(-50%, 0); }
+.toast.show { transform: translate(-50%, 0); visibility: visible; }
 
 /* konfeti */
 .confetti { position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden; }
