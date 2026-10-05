@@ -208,6 +208,51 @@ button { font-family: inherit; }
 .stack { display: grid; gap: clamp(12px, 1.6vw, 16px); }
 
 /* ============================================================
+   GUIDE CARD
+   ============================================================ */
+.guide-card {
+  background: linear-gradient(135deg, rgba(255, 77, 109, .08), rgba(58, 130, 246, .08));
+  border: 1px solid var(--border);
+}
+
+.guide-content { display: grid; gap: 12px; }
+
+.guide-item {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--text) 3%, transparent);
+  transition: background .25s ease, transform .25s var(--ease);
+}
+.guide-item:hover {
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  transform: translateX(2px);
+}
+
+.guide-icon {
+  font-size: 24px;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+
+.guide-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 2px 0;
+}
+
+.guide-text {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ============================================================
    4. BOARD
    ============================================================ */
 .board-card { padding: clamp(12px, 1.8vw, 18px); }
