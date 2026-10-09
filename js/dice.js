@@ -36,6 +36,11 @@ function showDice(d1, d2) {
       : `Dadu ${i + 1} menunjukkan ${v}`);
   });
   DOM.$totalDice.text(d1 ? d1 + d2 : '—');
+  if (d1) {
+    DOM.$totalDice.removeClass('bump');
+    void DOM.$totalDice[0].offsetWidth;
+    DOM.$totalDice.addClass('bump');
+  }
 }
 
 /**

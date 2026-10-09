@@ -80,20 +80,26 @@ function addLog(icon, html, value, type) {
  */
 function celebrate() {
   if (STATE.reduceMotion) return;
-  const colors = ['#ff4d6d', '#3b82f6', '#f59e0b', '#22c55e', '#a855f7', '#22d3ee'];
+  const colors = ['#ff4d6d', '#3b82f6', '#f59e0b', '#22c55e', '#a855f7', '#22d3ee', '#ffd76a'];
   const layer = document.getElementById('confetti');
   const frag = document.createDocumentFragment();
-  for (let i = 0; i < 90; i++) {
+  for (let i = 0; i < 130; i++) {
     const piece = document.createElement('span');
     piece.className = 'confetti-piece';
+    const size = 7 + Math.random() * 8;
+    const round = Math.random() > 0.65;
     piece.style.left = Math.random() * 100 + '%';
+    piece.style.width = size + 'px';
+    piece.style.height = (round ? size : size * (0.5 + Math.random() * 0.8)) + 'px';
+    piece.style.borderRadius = round ? '50%' : '2px';
     piece.style.background = colors[i % colors.length];
-    piece.style.animationDelay = (Math.random() * 0.6) + 's';
-    piece.style.animationDuration = (1.9 + Math.random() * 1.5) + 's';
+    piece.style.animationName = Math.random() > 0.5 ? 'fall-sway' : 'fall';
+    piece.style.animationDelay = (Math.random() * 0.8) + 's';
+    piece.style.animationDuration = (2 + Math.random() * 1.6) + 's';
     frag.appendChild(piece);
   }
   layer.appendChild(frag);
-  setTimeout(() => { layer.innerHTML = ''; }, 4200);
+  setTimeout(() => { layer.innerHTML = ''; }, 4600);
 }
 
 /**

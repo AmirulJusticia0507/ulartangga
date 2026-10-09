@@ -52,8 +52,11 @@ function finishMovement(player, finalPosition, trap) {
 function animateMove(player, finalPosition, steps, trap) {
   const path = steps.slice();
   const delay = STATE.reduceMotion ? 20 : CONFIG.STEP_MS;
+  const $token = DOM.$token(player);
+  const trapClass = trap ? (trap.type === 'snake' ? 'is-drop' : 'is-boost') : '';
 
   if (trap) {
+    $token.addClass(trapClass);
     const from = steps.length ? steps[steps.length - 1] : STATE.players[player];
     const segs = 5;
     for (let i = 1; i <= segs; i++) {
@@ -71,6 +74,7 @@ function animateMove(player, finalPosition, steps, trap) {
     } else {
       STATE.players[player] = finalPosition;
       renderTokens();
+      if (trapClass) $token.removeClass(trapClass);
       finishMovement(player, finalPosition, trap);
     }
   };
