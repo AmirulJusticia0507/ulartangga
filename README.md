@@ -1,7 +1,7 @@
 # 🎲 Game Ular Tangga (Snake 'n Ladder)
 
-Permainan ular tangga versi web dengan tampilan modern. Dua pemain (`Pemain 1` vs `Pemain 2`)
-atau melawan AI Computer, bermain di papan 100 kotak hingga ada yang mendarat tepat di kotak 100.
+Permainan web dengan dua mode yang dapat ditukar dari tombol di header: Ular Tangga dan
+WNI Simulator. Keduanya mendukung dua pemain atau permainan melawan AI.
 
 Proyek ini statis — tanpa build step, tanpa backend. Cukup buka `index.html` di browser.
 
@@ -39,6 +39,8 @@ Proyek ini statis — tanpa build step, tanpa backend. Cukup buka `index.html` d
 | ⌨️ **Shortcut keyboard** | Tekan `Spasi` untuk melempar dadu. |
 | 🎉 **Konfeti + modal kemenangan** | Efek konfeti dan modal beri tema yang senada dengan tema halaman. |
 | 📱 **Responsif** | Papan mengikuti lebar container, selalu persegi, dan tidak pernah overflow — dari 320px sampai layar lebar. |
+| 🔀 **Switch game** | Berpindah antara Ular Tangga dan WNI Simulator tanpa memuat ulang halaman. |
+| 🇮🇩 **WNI Simulator** | Board 20 petak melingkar, ekonomi bansos, properti/sewa, kartu Takdir/Musibah, penyitaan, AI, bangkrut, dan penentuan pemenang setelah 8 putaran. |
 
 ---
 
@@ -76,7 +78,7 @@ php -S localhost:8080
 
 ---
 
-## 🎯 Aturan Main
+## 🎯 Aturan Main — Ular Tangga
 
 1. Pilih mode: **2 Pemain** atau **Vs AI**.
 2. Klik **Lempar Dadu** (atau tekan `Spasi`) untuk mengundi 2 dadu.
@@ -86,11 +88,27 @@ php -S localhost:8080
 6. Jika **melewati** kotak 100, pemain tidak bergerak dan muncul notifikasi.
 7. Pemain pertama yang mencapai **kotak 100** menang.
 
+## 🇮🇩 Aturan Main — WNI Simulator
+
+1. Gunakan tombol **WNI Simulator** di header, lalu pilih **2 Pemain** atau **Vs AI**.
+2. Setiap pemain memulai dengan **Rp3.000.000** dan bergantian melempar dua dadu.
+3. Lewati petak Mulai untuk menerima **Rp500.000**.
+4. Saat mendarat di properti kosong, pemain dapat membeli properti. Pemain lain yang mendarat di sana membayar sewa kepada pemilik.
+5. Petak pajak, Kartu Takdir, Kartu Musibah, dan Penyitaan dapat menambah atau mengurangi dana maupun aset.
+6. Saldo yang tidak cukup untuk membayar kewajiban menyebabkan pemain bangkrut dan lawan menang.
+7. Jika tidak ada yang bangkrut, kekayaan bersih tertinggi setelah **8 putaran penuh** menjadi pemenang. Nilai kekayaan bersih adalah saldo tunai ditambah harga beli aset.
+
+Susunan jalur keliling mengambil inspirasi dari format board game roll-and-move yang dibahas
+[artikel RRI](https://rri.co.id/padang/hobi/2786368/mencoba-sensasi-bertahan-hidup-lewat-gim-wni-simulator)
+dan [situs WNI Simulator](https://wnisimulator.hecticholic.id/#box). Nama petak, tampilan, dan
+efek kartu di implementasi ini merupakan konten orisinal untuk versi web, bukan salinan artwork
+papan fisik.
+
 ---
 
 ## 🗺️ Struktur Papan
 
-Papan berisi **100 kotak** dengan susunan zigzag (baris alternating arah, seperti ular tangga asli):
+Papan Ular Tangga berisi **100 kotak** dengan susunan zigzag:
 
 - Baris paling bawah (1–10):  `1 → 10` (mulai di kiri bawah)
 - Baris berikutnya (11–20):   `20 → 11`
@@ -130,6 +148,7 @@ ulartangga/
 │   ├── render.js           # Seluruh fungsi render UI
 │   ├── dice.js             # Logika & animasi dadu
 │   ├── game.js             # Engine permainan
+│   ├── wni.js              # Papan 20 petak, ekonomi, kartu, AI, dan game flow WNI
 │   └── main.js             # Event handler & inisialisasi
 ├── ular.png                # Aset gambar kepala ular
 ├── tangga.png              # Aset gambar tangga
@@ -158,8 +177,9 @@ Semua library dimuat dari CDN, tidak ada `package.json` maupun proses bundling.
 
 ## 🧩 Cara Kerja Kode
 
-Semua modul adalah file terpisah yang dimuat berurutan di `index.html`
-(`config` → `state` → `utils` → `board` → `render` → `dice` → `game` → `main`).
+Modul dimuat berurutan di `index.html`: modul Ular Tangga (`config` → `state` → `utils` →
+`board` → `render` → `dice` → `game`), dilanjutkan `wni.js` dan `main.js` untuk inisialisasi
+serta switch game.
 
 ### State permainan (`js/state.js`)
 

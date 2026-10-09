@@ -1,6 +1,7 @@
-# Struktur Proyek Ular Tangga
+# Struktur Proyek Game
 
-Proyek ini telah dipecah menjadi komponen-komponen modular untuk kemudahan maintenance dan readability.
+Proyek berisi Ular Tangga dan WNI Simulator, dipisah menjadi komponen modular agar kedua mode
+berbagi shell aplikasi tetapi tetap memiliki state dan engine permainan masing-masing.
 
 ## Struktur Folder
 
@@ -17,6 +18,7 @@ ulartangga/
 │   ├── render.js           # UI rendering functions
 │   ├── dice.js             # Dice logic & animation
 │   ├── game.js             # Game engine & logic
+│   ├── wni.js              # Board loop, state ekonomi, kartu, dan AI WNI Simulator
 │   └── main.js             # Event handlers & initialization
 ├── ular.png                # Asset gambar ular
 └── tangga.png              # Asset gambar tangga
@@ -101,19 +103,27 @@ Game engine & logic:
 - `startGame()`: Mulai game baru
 - `resetGame()`: Reset game ke state awal
 
+#### wni.js
+Game engine WNI Simulator:
+- `WNI_TILES`: Data 20 petak keliling, tipe petak, harga, dan sewa.
+- `WNI`: State independen untuk pemain, saldo, aset, giliran, dan putaran.
+- `wniBuildBoard()`: Generate jalur melingkar 20 petak pada grid 6×6.
+- `wniPlayTurn()` / `wniMove()`: Lempar dadu dan gerakkan token di jalur.
+- `wniResolveTile()`: Beli properti, bayar sewa/pajak, tarik kartu, atau hadapi penyitaan.
+- `wniNextTurn()` / `wniGameOver()`: AI, batas 8 putaran, bangkrut, dan pemenang.
+
 #### main.js
 Event handlers & initialization:
-- Event listeners untuk buttons
-- Theme toggle handler
-- Keyboard shortcuts (spacebar to roll)
-- Window resize handler (redraw SVG)
-- Theme persistence (localStorage)
-- Initialization flow
+- Switch antara tampilan Ular Tangga dan WNI Simulator tanpa reload.
+- Theme toggle handler dan penyimpanan preferensi tema.
+- Shortcut Space untuk melempar pada game yang sedang tampil.
+- Window resize handler untuk menggambar ulang SVG Ular Tangga.
+- Inisialisasi Ular Tangga dan state view awal.
 
 ## Load Order
 
 Script harus diload dengan urutan ini (sudah benar di index.html):
-1. config.js → 2. state.js → 3. utils.js → 4. board.js → 5. render.js → 6. dice.js → 7. game.js → 8. main.js
+1. config.js → 2. state.js → 3. utils.js → 4. board.js → 5. render.js → 6. dice.js → 7. game.js → 8. wni.js → 9. main.js
 
 Ini penting karena setiap module bergantung pada yang sebelumnya.
 
@@ -127,7 +137,8 @@ Ini penting karena setiap module bergantung pada yang sebelumnya.
 5. Jika butuh event handler → edit `main.js`
 
 ### Bug fixing:
-- Game logic issues → check `game.js`
+- Ular Tangga logic issues → check `game.js`
+- WNI Simulator logic issues → check `wni.js`
 - Rendering issues → check `render.js`
 - Board issues → check `board.js`
 - Styling issues → check `css/styles.css`

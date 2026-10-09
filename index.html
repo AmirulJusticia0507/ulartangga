@@ -21,16 +21,26 @@
   <a class="skip-link" href="#mainContent">Langsung ke permainan</a>
   <header class="app-header">
     <div class="brand">
-      <div class="brand__mark" aria-hidden="true">🎲</div>
+      <div class="brand__mark" id="brandMark" aria-hidden="true">🎲</div>
       <div>
-        <h1 class="brand__title">Ular Tangga</h1>
-        <p class="brand__sub">Naik tangga, hindari ular, capai kotak 100.</p>
+        <h1 class="brand__title" id="brandTitle">Ular Tangga</h1>
+        <p class="brand__sub" id="brandSub">Naik tangga, hindari ular, capai kotak 100.</p>
       </div>
     </div>
-    <button class="icon-btn" id="themeToggle" type="button" aria-label="Aktifkan tema terang" aria-pressed="false">🌙</button>
+    <div class="header-actions">
+      <button class="game-switch" id="gameSwitch" type="button" aria-label="Ganti ke WNI Simulator" aria-pressed="false">
+        <span class="game-switch__icon" id="gameSwitchIcon" aria-hidden="true">🏢</span>
+        <span class="game-switch__text">
+          <span class="game-switch__label">Main</span>
+          <span class="game-switch__name" id="gameSwitchName">WNI Simulator</span>
+        </span>
+      </button>
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="Aktifkan tema terang" aria-pressed="false">🌙</button>
+    </div>
   </header>
 
-  <main class="layout" id="mainContent">
+  <main id="mainContent">
+  <div class="layout" id="snakeView">
     <section class="card board-card" aria-labelledby="boardTitle">
       <div class="card__head">
         <h2 class="card__title" id="boardTitle">Papan Main</h2>
@@ -146,9 +156,129 @@
         <div class="log" id="logList" role="log" aria-label="Riwayat permainan" aria-relevant="additions text"></div>
       </section>
     </aside>
+  </div>
+
+  <div class="layout wni-layout" id="wniView" hidden>
+    <section class="card board-card wni-card" aria-labelledby="wniBoardTitle">
+      <div class="card__head">
+        <h2 class="card__title" id="wniBoardTitle">Papan WNI</h2>
+        <div class="turn-badge" id="wniTurnBadge" style="--c1: var(--muted)">
+          <span class="turn-badge__dot" aria-hidden="true"></span>
+          <span class="turn-badge__name" id="wniTurnName" aria-live="polite">Belum mulai</span>
+        </div>
+      </div>
+
+      <div class="wni-wrap" id="wniWrap">
+        <div class="wni-board" id="wniBoard" role="group" aria-label="Jalur keliling WNI Simulator, 20 petak"></div>
+        <div class="board-hint" id="wniHint">
+          <div>
+            <span>Pilih mode untuk mulai bertahan hidup</span>
+            <small>Kelola dana bansos, beli aset, hindari musibah &amp; penyitaan negara</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="stack" aria-label="Kontrol WNI Simulator dan informasi">
+      <section class="card mode-card" aria-labelledby="wniModeTitle">
+        <div class="card__head"><h2 class="card__title" id="wniModeTitle">Pilih mode</h2></div>
+        <div class="segmented" role="group" aria-label="Mode permainan WNI">
+          <button type="button" id="wniPvpMode" aria-pressed="false">
+            <span aria-hidden="true">👥</span> 2 Pemain
+          </button>
+          <button type="button" id="wniAiMode" aria-pressed="false">
+            <span aria-hidden="true">🤖</span> Vs AI
+          </button>
+        </div>
+      </section>
+
+      <section class="card players-card" aria-labelledby="wniPlayersTitle">
+        <div class="card__head"><h2 class="card__title" id="wniPlayersTitle">Nasib WNI</h2></div>
+        <div class="players" id="wniPlayers"></div>
+      </section>
+
+      <section class="card dice-card" aria-labelledby="wniDiceTitle">
+        <div class="card__head"><h2 class="card__title" id="wniDiceTitle">Lemparan</h2></div>
+        <div class="dice-area">
+          <div class="dice-pair" aria-label="Hasil dadu">
+            <div class="die is-idle" id="wniDie1" role="img" aria-label="Dadu pertama"></div>
+            <div class="die is-idle" id="wniDie2" role="img" aria-label="Dadu kedua"></div>
+          </div>
+          <div class="dice-total">
+            <div class="dice-total__value" id="wniTotal" aria-live="polite">—</div>
+            <div class="dice-total__label">Total</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card actions-card" aria-label="Aksi permainan WNI">
+        <div class="actions">
+          <button class="btn" id="wniRoll" type="button" disabled>
+            <span aria-hidden="true">🎲</span> Lempar Dadu
+            <span class="btn__key" aria-hidden="true">SPACE</span>
+          </button>
+          <button class="btn btn--ghost" id="wniReset" type="button" aria-label="Reset permainan WNI">🔄</button>
+        </div>
+      </section>
+
+      <section class="card wni-status-card" aria-labelledby="wniStatusTitle">
+        <div class="card__head">
+          <h2 class="card__title" id="wniStatusTitle">Status</h2>
+          <span class="wni-round" id="wniRound">Putaran 0/8</span>
+        </div>
+        <div class="wni-networth" id="wniNetworth"></div>
+      </section>
+
+      <section class="card guide-card" aria-labelledby="wniGuideTitle">
+        <div class="card__head"><h2 class="card__title" id="wniGuideTitle">🎮 Petunjuk</h2></div>
+        <div class="guide-content">
+          <div class="guide-item">
+            <span class="guide-icon" aria-hidden="true">💵</span>
+            <div>
+              <p class="guide-label">Dana Bansos</p>
+              <p class="guide-text">Mulai dengan Rp3.000.000. Lewat START dapat Rp500.000.</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon" aria-hidden="true">🏘️</span>
+            <div>
+              <p class="guide-label">Beli Aset</p>
+              <p class="guide-text">Belanja properti, lawan yang mendarat bayar sewa.</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon" aria-hidden="true">🃏</span>
+            <div>
+              <p class="guide-label">Kartu Musibah &amp; Takdir</p>
+              <p class="guide-text">Tilang, macet, tagihan mendadak—atau rezeki nomplok.</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon" aria-hidden="true">🚫</span>
+            <div>
+              <p class="guide-label">Penyitaan Aset</p>
+              <p class="guide-text">Negara bisa menyita propertimu. Hati-hati!</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon" aria-hidden="true">🏆</span>
+            <div>
+              <p class="guide-label">Bertahan 8 Putaran</p>
+              <p class="guide-text">Kekayaan terbanyak menang. Bangkrut = kalah.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card history-card" aria-labelledby="wniHistoryTitle">
+        <div class="card__head"><h2 class="card__title" id="wniHistoryTitle">Riwayat</h2></div>
+        <div class="log" id="wniLog" role="log" aria-label="Riwayat WNI" aria-relevant="additions text"></div>
+      </section>
+    </aside>
+  </div>
   </main>
 
-  <footer class="app-footer">© 2025 Amirul Putra Justicia <span aria-hidden="true">·</span> Snake ’n Ladder</footer>
+  <footer class="app-footer">© 2025 Amirul Putra Justicia <span aria-hidden="true">·</span> Snake ’n Ladder &amp; WNI Simulator</footer>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -161,6 +291,7 @@
 <script src="js/render.js"></script>
 <script src="js/dice.js"></script>
 <script src="js/game.js"></script>
+<script src="js/wni.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
