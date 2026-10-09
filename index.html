@@ -18,21 +18,22 @@
 <div class="confetti" id="confetti" aria-hidden="true"></div>
 
 <div class="app">
+  <a class="skip-link" href="#mainContent">Langsung ke permainan</a>
   <header class="app-header">
     <div class="brand">
-      <div class="brand__mark" aria-hidden="true">�</div>
+      <div class="brand__mark" aria-hidden="true">🎲</div>
       <div>
         <h1 class="brand__title">Ular Tangga</h1>
         <p class="brand__sub">Naik tangga, hindari ular, capai kotak 100.</p>
       </div>
     </div>
-    <button class="icon-btn" id="themeToggle" type="button" aria-label="Ganti tema terang/gelap">🌙</button>
+    <button class="icon-btn" id="themeToggle" type="button" aria-label="Aktifkan tema terang" aria-pressed="false">🌙</button>
   </header>
 
-  <main class="layout">
-    <section class="card board-card">
+  <main class="layout" id="mainContent">
+    <section class="card board-card" aria-labelledby="boardTitle">
       <div class="card__head">
-        <h2 class="card__title">Papan Main</h2>
+        <h2 class="card__title" id="boardTitle">Papan Main</h2>
         <div class="turn-badge" id="turnBadge" style="--c1: var(--muted)">
           <span class="turn-badge__dot" aria-hidden="true"></span>
           <span class="turn-badge__name" id="turnName" aria-live="polite">Belum mulai</span>
@@ -42,7 +43,7 @@
       <div class="board-wrap" id="boardWrap">
         <svg class="board-links" id="boardLinks" aria-hidden="true" preserveAspectRatio="none"></svg>
         <div class="board-decor" id="boardDecor" aria-hidden="true"></div>
-        <div class="board" id="board" role="grid" aria-label="Papan ular tangga 100 kotak"></div>
+        <div class="board" id="board" role="table" aria-label="Papan ular tangga 100 kotak" aria-rowcount="10" aria-colcount="10"></div>
         <div class="board-hint" id="boardHint">
           <div>
             <span>Pilih mode permainan untuk mulai</span>
@@ -52,51 +53,10 @@
       </div>
     </section>
 
-    <aside class="stack">
-      <section class="card guide-card">
-        <div class="card__head"><h2 class="card__title">🎮 Petunjuk</h2></div>
-        <div class="guide-content">
-          <div class="guide-item">
-            <span class="guide-icon">🎲</span>
-            <div>
-              <p class="guide-label">Mulai Permainan</p>
-              <p class="guide-text">Pilih mode 2 Pemain atau Vs AI</p>
-            </div>
-          </div>
-          <div class="guide-item">
-            <span class="guide-icon">🎯</span>
-            <div>
-              <p class="guide-label">Lempar Dadu</p>
-              <p class="guide-text">Tekan tombol atau Space Bar</p>
-            </div>
-          </div>
-          <div class="guide-item">
-            <span class="guide-icon">🪜</span>
-            <div>
-              <p class="guide-label">Naik Tangga</p>
-              <p class="guide-text">Hitung Anda maju lebih jauh!</p>
-            </div>
-          </div>
-          <div class="guide-item">
-            <span class="guide-icon">🐍</span>
-            <div>
-              <p class="guide-label">Hindari Ular</p>
-              <p class="guide-text">Ular akan membuat Anda mundur</p>
-            </div>
-          </div>
-          <div class="guide-item">
-            <span class="guide-icon">🏆</span>
-            <div>
-              <p class="guide-label">Capai Kotak 100</p>
-              <p class="guide-text">Pemain pertama yang sampai menang!</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="card__head"><h2 class="card__title">Mode</h2></div>
-        <div class="segmented">
+    <aside class="stack" aria-label="Kontrol permainan dan informasi">
+      <section class="card mode-card" aria-labelledby="modeTitle">
+        <div class="card__head"><h2 class="card__title" id="modeTitle">Pilih mode</h2></div>
+        <div class="segmented" role="group" aria-label="Mode permainan">
           <button type="button" id="pvpMode" aria-pressed="false">
             <span aria-hidden="true">👥</span> 2 Pemain
           </button>
@@ -106,17 +66,17 @@
         </div>
       </section>
 
-      <section class="card">
-        <div class="card__head"><h2 class="card__title">Pemain</h2></div>
+      <section class="card players-card" aria-labelledby="playersTitle">
+        <div class="card__head"><h2 class="card__title" id="playersTitle">Pemain</h2></div>
         <div class="players" id="players"></div>
       </section>
 
-      <section class="card">
-        <div class="card__head"><h2 class="card__title">Lemparan</h2></div>
+      <section class="card dice-card" aria-labelledby="diceTitle">
+        <div class="card__head"><h2 class="card__title" id="diceTitle">Lemparan</h2></div>
         <div class="dice-area">
-          <div class="dice-pair">
-            <div class="die is-idle" id="die1" aria-label="Dadu pertama"></div>
-            <div class="die is-idle" id="die2" aria-label="Dadu kedua"></div>
+          <div class="dice-pair" aria-label="Hasil dadu">
+            <div class="die is-idle" id="die1" role="img" aria-label="Dadu pertama"></div>
+            <div class="die is-idle" id="die2" role="img" aria-label="Dadu kedua"></div>
           </div>
           <div class="dice-total">
             <div class="dice-total__value" id="totalDice" aria-live="polite">—</div>
@@ -125,7 +85,7 @@
         </div>
       </section>
 
-      <section class="card">
+      <section class="card actions-card" aria-label="Aksi permainan">
         <div class="actions">
           <button class="btn" id="rollDice" type="button" disabled>
             <span aria-hidden="true">🎲</span> Lempar Dadu
@@ -135,19 +95,60 @@
         </div>
       </section>
 
-      <section class="card">
-        <div class="card__head"><h2 class="card__title">🏆 Leaderboard</h2></div>
+      <section class="card guide-card" aria-labelledby="guideTitle">
+        <div class="card__head"><h2 class="card__title" id="guideTitle">🎮 Petunjuk</h2></div>
+        <div class="guide-content">
+          <div class="guide-item">
+            <span class="guide-icon" aria-hidden="true">🎲</span>
+            <div>
+              <p class="guide-label">Mulai Permainan</p>
+              <p class="guide-text">Pilih mode 2 Pemain atau Vs AI</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon" aria-hidden="true">🎯</span>
+            <div>
+              <p class="guide-label">Lempar Dadu</p>
+              <p class="guide-text">Tekan tombol atau Space Bar</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon" aria-hidden="true">🪜</span>
+            <div>
+              <p class="guide-label">Naik Tangga</p>
+              <p class="guide-text">Hitung Anda maju lebih jauh!</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon" aria-hidden="true">🐍</span>
+            <div>
+              <p class="guide-label">Hindari Ular</p>
+              <p class="guide-text">Ular akan membuat Anda mundur</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon" aria-hidden="true">🏆</span>
+            <div>
+              <p class="guide-label">Capai Kotak 100</p>
+              <p class="guide-text">Pemain pertama yang sampai menang!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card leaderboard-card" aria-labelledby="leaderboardTitle">
+        <div class="card__head"><h2 class="card__title" id="leaderboardTitle">🏆 Leaderboard</h2></div>
         <div class="rank-list" id="leaderboardList"></div>
       </section>
 
-      <section class="card">
-        <div class="card__head"><h2 class="card__title">Riwayat</h2></div>
-        <div class="log" id="logList"></div>
+      <section class="card history-card" aria-labelledby="historyTitle">
+        <div class="card__head"><h2 class="card__title" id="historyTitle">Riwayat</h2></div>
+        <div class="log" id="logList" role="log" aria-label="Riwayat permainan" aria-relevant="additions text"></div>
       </section>
     </aside>
   </main>
 
-  <footer class="app-footer">© 2025 Amirul Putra Justicia — Snake 'n Ladder</footer>
+  <footer class="app-footer">© 2025 Amirul Putra Justicia <span aria-hidden="true">·</span> Snake ’n Ladder</footer>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>

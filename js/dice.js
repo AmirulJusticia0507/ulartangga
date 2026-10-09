@@ -31,6 +31,9 @@ function showDice(d1, d2) {
   [DOM.$die1, DOM.$die2].forEach(($d, i) => {
     const v = i === 0 ? d1 : d2;
     $d.toggleClass('is-idle', idle).html(pipHtml(v));
+    $d.attr('aria-label', idle
+      ? `Dadu ${i + 1} belum dilempar`
+      : `Dadu ${i + 1} menunjukkan ${v}`);
   });
   DOM.$totalDice.text(d1 ? d1 + d2 : '—');
 }
@@ -41,12 +44,14 @@ function showDice(d1, d2) {
 function rollDice() {
   const $d1 = DOM.$die1, $d2 = DOM.$die2;
   $d1.add($d2).removeClass('is-idle').addClass('rolling');
+  $d1.add($d2).attr('aria-busy', 'true');
   return new Promise((resolve) => {
     setTimeout(() => {
       const d1 = Math.floor(Math.random() * 6) + 1;
       const d2 = Math.floor(Math.random() * 6) + 1;
       $d1.add($d2).removeClass('rolling');
       showDice(d1, d2);
+      $d1.add($d2).removeAttr('aria-busy');
       resolve(d1 + d2);
     }, STATE.reduceMotion ? 60 : 520);
   });

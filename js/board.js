@@ -25,6 +25,8 @@ function buildBoard() {
   let html = '';
   for (let row = CONFIG.ROWS - 1; row >= 0; row--) {
     const start = row * CONFIG.COLS + 1;
+    const rowIndex = CONFIG.ROWS - row;
+    html += `<div class="board__row" role="row" aria-rowindex="${rowIndex}">`;
     for (let i = 0; i < CONFIG.COLS; i++) {
       const n = row % 2 === 0 ? start + i : start + CONFIG.COLS - 1 - i;
       const classes = [cellClass(n)];
@@ -33,8 +35,10 @@ function buildBoard() {
       if (n === CONFIG.BOARD_SIZE) classes.push('goal-cell');
       const tooltip = getCellTooltip(n);
       const tooltipAttr = tooltip ? ` data-tip="${tooltip}"` : '';
-      html += `<div class="cell ${classes.join(' ').trim()}" id="cell${n}" role="gridcell"${tooltipAttr}><span class="cell__num">${n}</span></div>`;
+      const label = tooltip ? `Kotak ${n}. ${tooltip}` : `Kotak ${n}`;
+      html += `<div class="cell ${classes.join(' ').trim()}" id="cell${n}" role="cell" aria-colindex="${i + 1}" aria-label="${label}"${tooltipAttr}><span class="cell__num">${n}</span></div>`;
     }
+    html += '</div>';
   }
   DOM.$board.html(html);
 

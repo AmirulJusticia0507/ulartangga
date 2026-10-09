@@ -23,14 +23,15 @@ $(function () {
     const light = document.documentElement.dataset.theme === 'light';
     document.documentElement.dataset.theme = light ? 'dark' : 'light';
     this.textContent = light ? '🌙' : '☀️';
-    this.setAttribute('aria-label', light ? 'Aktifkan tema gelap' : 'Aktifkan tema terang');
+    this.setAttribute('aria-label', light ? 'Aktifkan tema terang' : 'Aktifkan tema gelap');
+    this.setAttribute('aria-pressed', String(!light));
     try { localStorage.setItem('ut-theme', document.documentElement.dataset.theme); } catch (e) {}
     requestAnimationFrame(drawLinks);
   });
 
   // Keyboard Shortcut (Spacebar to Roll Dice)
   $(document).on('keydown', function (e) {
-    if (e.code === 'Space' && !$(e.target).is('button')) {
+    if (e.code === 'Space' && !$(e.target).is('button, input, textarea, select, [contenteditable="true"]')) {
       e.preventDefault();
       playTurn();
     }
@@ -53,6 +54,8 @@ $(function () {
     if (saved === 'light' || saved === 'dark') {
       document.documentElement.dataset.theme = saved;
       DOM.$themeToggle.text(saved === 'light' ? '☀️' : '🌙');
+      DOM.$themeToggle.attr('aria-pressed', String(saved === 'light'));
+      DOM.$themeToggle.attr('aria-label', saved === 'light' ? 'Aktifkan tema gelap' : 'Aktifkan tema terang');
     }
   } catch (e) {}
 
