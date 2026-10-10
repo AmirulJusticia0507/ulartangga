@@ -881,12 +881,13 @@ html[data-theme="dark"] .die {
   color: var(--text);
   box-shadow: none;
 }
+.wni-reset { padding-inline: 12px; font-size: 13px; }
 .btn--ghost::after { display: none; }
 .btn--ghost:hover:not(:disabled) {
   background: var(--surface);
   border-color: var(--border-strong);
   box-shadow: var(--shadow-sm);
-  transform: translateY(-2px) rotate(180deg);
+  transform: translateY(-2px);
 }
 .btn__key {
   font-size: 10px;
