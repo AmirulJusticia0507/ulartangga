@@ -1458,16 +1458,32 @@ html[data-theme="dark"] .die {
 .wni-money small { display: block; font-size: 9.5px; color: var(--muted); font-weight: 600; }
 .wni-money.is-low { color: var(--p1-a); animation: money-pulse 1.4s ease-in-out infinite; }
 @keyframes money-pulse { 50% { opacity: .55; } }
-.wni-assets { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.wni-assets { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
 .wni-asset {
+  display: grid;
+  gap: 3px;
   font-size: 9.5px;
   font-weight: 700;
-  padding: 2px 7px;
-  border-radius: var(--pill);
+  padding: 5px 7px;
+  border-radius: 6px;
   background: color-mix(in srgb, var(--c1) 18%, transparent);
   border: 1px solid color-mix(in srgb, var(--c1) 45%, transparent);
   color: var(--text);
 }
+.wni-asset small { color: var(--muted); font-size: 8.5px; }
+.wni-asset__upgrade {
+  min-height: 22px;
+  padding: 2px 5px;
+  border: 1px solid color-mix(in srgb, var(--c1) 45%, transparent);
+  border-radius: 4px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--c1) 18%, var(--surface));
+  font: inherit;
+  font-size: 8.5px;
+  cursor: pointer;
+}
+.wni-asset__upgrade:hover:not(:disabled) { background: color-mix(in srgb, var(--c1) 32%, var(--surface)); }
+.wni-asset__upgrade:disabled { opacity: .55; cursor: not-allowed; }
 
 .wni-round {
   font-size: 11px;
@@ -1656,6 +1672,18 @@ html[data-theme="dark"] .die {
   white-space: nowrap;
 }
 .wni-tile__rent { opacity: .76; }
+.wni-tile__building {
+  min-height: 1em;
+  color: #674416;
+  font-size: clamp(8px, 1.1vw, 12px);
+  font-weight: 900;
+  line-height: 1;
+}
+.wni-tile.is-upgraded-1, .wni-tile.is-upgraded-2, .wni-tile.is-upgraded-3 {
+  box-shadow: inset 0 0 0 2px #ffdb55, 0 3px 8px rgba(23, 23, 20, .24);
+}
+.wni-tile.is-upgraded-2 { background-image: linear-gradient(145deg, rgba(255, 219, 85, .22), transparent 62%); }
+.wni-tile.is-upgraded-3 { background-image: linear-gradient(145deg, rgba(255, 219, 85, .4), transparent 72%); }
 .wni-tile--start {
   border-color: #d2a445;
   background: linear-gradient(145deg, #fff2bd, #e8bb58);
@@ -1862,6 +1890,9 @@ html[data-game="wni"] .wni-tile--property {
 html[data-game="wni"] .wni-tile--property .wni-tile__name,
 html[data-game="wni"] .wni-tile--property .wni-tile__price,
 html[data-game="wni"] .wni-tile--property .wni-tile__rent { color: #fff9e9; }
+html[data-game="wni"] .wni-tile--property .wni-tile__building { color: #ffdb55; }
+html[data-game="wni"] .wni-tile.is-upgraded-2 { background-image: linear-gradient(145deg, rgba(255, 219, 85, .22), transparent 62%); }
+html[data-game="wni"] .wni-tile.is-upgraded-3 { background-image: linear-gradient(145deg, rgba(255, 219, 85, .4), transparent 72%); }
 
 html[data-game="wni"] .wni-tile--kesempatan {
   background: #e52620;
@@ -1926,6 +1957,11 @@ html[data-game="wni"] .wni-player.is-turn {
 html[data-game="wni"] .wni-asset {
   color: var(--text);
   border-radius: 3px;
+}
+html[data-game="wni"] .wni-asset__upgrade {
+  border-color: var(--c1);
+  color: var(--text);
+  background: color-mix(in srgb, var(--c1) 18%, var(--surface));
 }
 
 html[data-game="wni"] .wni-round {

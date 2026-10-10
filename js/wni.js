@@ -12,6 +12,8 @@ const WNI_CONFIG = {
   LOW_MONEY: 500000,
   PAJAK: 300000,
   DENDA_SITA: 500000,
+  MAX_PROPERTY_LEVEL: 3,
+  PROPERTY_UPGRADE_RATE: 0.5,
   STEP_MS: 260,
   AI_DELAY: 900
 };
@@ -146,6 +148,7 @@ function wniResetState(playerCount = 2, clearSavedGame = true) {
     money: WNI_CONFIG.START_MONEY,
     pos: 0,
     props: [],
+    upgrades: {},
     eliminated: false
   }));
   WNI.log = [];
@@ -206,7 +209,28 @@ function wniVar(i) {
   ][i];
 }
 function wniNet(i) {
-  return WNI.players[i].money + WNI.players[i].props.reduce((s, idx) => s + WNI_TILES[idx].price, 0);
+  return WNI.players[i].money + WNI.players[i].props.reduce((sum, idx) => {
+    const tile = WNI_TILES[idx];
+    return sum + tile.price + wniUpgradeLevel(WNI.players[i], idx) * wniUpgradeCost(idx);
+  }, 0);
+}
+function wniUpgradeLevel(player, idx) {
+  return Number.isInteger(player.upgrades?.[idx]) ? player.upgrades[idx] : 0;
+}
+function wniUpgradeCost(idx) {
+  return Math.round(WNI_TILES[idx].price * WNI_CONFIG.PROPERTY_UPGRADE_RATE);
+}
+function wniRent(idx, level = 0) {
+  return WNI_TILES[idx].rent * (2 ** level);
+}
+function wniCanUpgrade(playerIndex, idx) {
+  const player = WNI.players[playerIndex];
+  return WNI.started && !WNI.gameOver && !WNI.busy &&
+    !(WNI.isVsComputer && WNI.currentPlayer === 1) &&
+    !(WNI.isVsComputer && playerIndex === 1) &&
+    player && !player.eliminated && player.props.includes(idx) &&
+    wniUpgradeLevel(player, idx) < WNI_CONFIG.MAX_PROPERTY_LEVEL &&
+    player.money >= wniUpgradeCost(idx);
 }
 function wniPick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -273,13 +297,24 @@ function wniRestoreGame() {
   WNI.currentPlayer = Number.isInteger(saved.currentPlayer) &&
     saved.currentPlayer >= 0 && saved.currentPlayer < saved.playerCount ? saved.currentPlayer : 0;
   WNI.turnCount = Number.isInteger(saved.turnCount) && saved.turnCount >= 0 ? saved.turnCount : 0;
-  WNI.players = saved.players.map((player) => ({
-    money: player.money,
-    pos: player.pos % WNI_CONFIG.TILE_COUNT,
-    props: [...new Set(player.props.filter((idx) =>
-      idx < WNI_TILES.length && WNI_TILES[idx]?.type === 'property'))],
-    eliminated: player.eliminated === true
-  }));
+  WNI.players = saved.players.map((player) => {
+    const props = [...new Set(player.props.filter((idx) =>
+      idx < WNI_TILES.length && WNI_TILES[idx]?.type === 'property'))];
+    const upgrades = {};
+    props.forEach((idx) => {
+      const level = player.upgrades?.[idx];
+      if (Number.isInteger(level) && level >= 0 && level <= WNI_CONFIG.MAX_PROPERTY_LEVEL) {
+        upgrades[idx] = level;
+      }
+    });
+    return {
+      money: player.money,
+      pos: player.pos % WNI_CONFIG.TILE_COUNT,
+      props,
+      upgrades,
+      eliminated: player.eliminated === true
+    };
+  });
   WNI.owners = {};
   WNI.players.forEach((player, playerIndex) => {
     player.props.forEach((idx) => {
@@ -309,6 +344,10 @@ function wniRestoreGame() {
       }
     } else if (pending.type === 'buy' && Number.isInteger(pending.idx) &&
         WNI_TILES[pending.idx]?.type === 'property') {
+      WNI.pendingDecision = pending;
+    } else if (pending.type === 'upgrade' && Number.isInteger(pending.idx) &&
+        WNI_TILES[pending.idx]?.type === 'property' &&
+        WNI.players[pending.player].props.includes(pending.idx)) {
       WNI.pendingDecision = pending;
     }
   }
@@ -370,6 +409,7 @@ function wniBuildBoard() {
       <span class="wni-tile__number" aria-hidden="true">${i + 1}</span>
       <span class="wni-tile__emoji" aria-hidden="true">${t.emoji}</span>
       <span class="wni-tile__name">${t.name}</span>
+      ${t.price ? '<span class="wni-tile__building" aria-hidden="true"></span>' : ''}
       ${t.price ? `<span class="wni-tile__price">${wniShort(t.price)}</span>` : ''}
       ${t.rent ? `<span class="wni-tile__rent">Sewa ${wniShort(t.rent)}</span>` : ''}
       <span class="wni-tile__owner" aria-hidden="true"></span>
@@ -398,8 +438,21 @@ function wniRenderTokens() {
     $t.css('background', `linear-gradient(140deg, ${wniVar(player)})`);
     $t.toggleClass('is-turn', WNI.started && !WNI.gameOver && player === WNI.currentPlayer);
   });
-  W.$board.find('.wni-tile').removeClass('is-here-0 is-here-1 is-here-2 is-here-3 is-owned-0 is-owned-1 is-owned-2 is-owned-3');
+  W.$board.find('.wni-tile')
+    .removeClass('is-here-0 is-here-1 is-here-2 is-here-3 is-owned-0 is-owned-1 is-owned-2 is-owned-3 is-upgraded-1 is-upgraded-2 is-upgraded-3');
   W.$board.find('.wni-tile__owner').text('');
+  WNI_TILES.forEach((tile, idx) => {
+    if (tile.type !== 'property') return;
+    const $tile = $('#wniTile' + idx);
+    const owner = WNI.owners[idx];
+    const level = owner === undefined ? 0 : wniUpgradeLevel(WNI.players[owner], idx);
+    $tile.find('.wni-tile__rent').text(`Sewa ${wniShort(wniRent(idx, level))}`);
+    $tile.find('.wni-tile__building').text(level === WNI_CONFIG.MAX_PROPERTY_LEVEL ? '🏨' : '🏠'.repeat(level));
+    $tile.toggleClass('is-upgraded-1', level === 1)
+      .toggleClass('is-upgraded-2', level === 2)
+      .toggleClass('is-upgraded-3', level === 3);
+    $tile.attr('aria-label', `Petak ${idx + 1}: ${tile.name}${owner === undefined ? '' : `, milik Pemain ${owner + 1}, tingkat ${level}, sewa ${wniMoney(wniRent(idx, level))}`}`);
+  });
   WNI.players.forEach((player, i) => {
     $('#wniTile' + player.pos).addClass('is-here-' + i);
     player.props.forEach((idx) => {
@@ -417,7 +470,21 @@ function wniRenderPlayers() {
     const active = WNI.started && !WNI.gameOver && i === WNI.currentPlayer;
     const vars = wniVar(i).split(', ');
     const low = p.money < WNI_CONFIG.LOW_MONEY;
-    const assets = p.props.map((idx) => `<span class="wni-asset">${WNI_TILES[idx].emoji} ${WNI_TILES[idx].name}</span>`).join('');
+    const assets = p.props.map((idx) => {
+      const tile = WNI_TILES[idx];
+      const level = wniUpgradeLevel(p, idx);
+      const cost = wniUpgradeCost(idx);
+      const canUpgrade = wniCanUpgrade(i, idx);
+      const levelLabel = level === WNI_CONFIG.MAX_PROPERTY_LEVEL ? 'Maks' : `Lv ${level}/${WNI_CONFIG.MAX_PROPERTY_LEVEL}`;
+      const upgradeAction = WNI.isVsComputer && i === 1
+        ? ''
+        : `<button class="wni-asset__upgrade" type="button" data-wni-upgrade="${idx}" data-player="${i}" ${canUpgrade ? '' : 'disabled'} aria-label="${level === WNI_CONFIG.MAX_PROPERTY_LEVEL ? 'Tingkat upgrade maksimal' : `Upgrade ${tile.name} ke tingkat ${level + 1}, biaya ${wniMoney(cost)}`}">${level === WNI_CONFIG.MAX_PROPERTY_LEVEL ? 'Maks' : `⬆️ ${wniMoney(cost)}`}</button>`;
+      return `<span class="wni-asset">
+        <span>${tile.emoji} ${tile.name}</span>
+        <small>${levelLabel} · Sewa ${wniMoney(wniRent(idx, level))}</small>
+        ${upgradeAction}
+      </span>`;
+    }).join('');
     return `<div class="player-row wni-player${active ? ' is-turn' : ''}" data-p="${i + 1}" style="--c1:${vars[0]};--c2:${vars[1]}">
       <div class="player-row__avatar" aria-hidden="true">${wniIcon(i)}</div>
       <div>
@@ -604,7 +671,7 @@ function wniResolveTile(player) {
       wniLog('🏠', `${wniName(player)} mendarat di asetnya`, tile.name, 'self');
       return wniAfterAction(player);
     }
-    const rent = tile.rent;
+    const rent = wniRent(idx, wniUpgradeLevel(WNI.players[owner], idx));
     const paid = Math.min(p.money, rent);
     p.money -= rent;
     WNI.players[owner].money += paid;
@@ -633,6 +700,7 @@ function wniResolveTile(player) {
       let cheapest = p.props[0];
       p.props.forEach((i) => { if (WNI_TILES[i].price < WNI_TILES[cheapest].price) cheapest = i; });
       delete WNI.owners[cheapest];
+      delete p.upgrades[cheapest];
       p.props = p.props.filter((i) => i !== cheapest);
       toast(`🚫 Negara menyita ${WNI_TILES[cheapest].name}!`);
       wniLog('🚫', `Negara sita <strong>${WNI_TILES[cheapest].name}</strong> milik ${wniName(player)}`, '', 'sita');
@@ -665,6 +733,8 @@ function wniResumePendingDecision() {
     wniPromptStart(decision.player, decision.remaining);
   } else if (decision.type === 'buy') {
     wniPromptBuy(decision.player, decision.idx);
+  } else if (decision.type === 'upgrade') {
+    wniPromptUpgrade(decision);
   }
 }
 
@@ -789,12 +859,59 @@ function wniPromptBuy(player, idx) {
 
 function wniBuy(player, idx) {
   const tile = WNI_TILES[idx];
+  delete WNI.players[player].upgrades[idx];
   WNI.owners[idx] = player;
   WNI.players[player].money -= tile.price;
   WNI.players[player].props.push(idx);
   toast(`🏠 ${wniName(player)} beli ${tile.name} ${wniMoney(tile.price)}`);
   wniLog('🏠', `<strong>${wniName(player)}</strong> beli ${tile.name}`, '-' + wniMoney(tile.price), 'buy');
   wniRender();
+}
+
+function wniRequestUpgrade(player, idx) {
+  if (!wniCanUpgrade(player, idx)) return;
+  WNI.pendingDecision = { type: 'upgrade', player, idx };
+  WNI.busy = true;
+  wniRender();
+  wniPromptUpgrade(WNI.pendingDecision);
+}
+
+function wniPromptUpgrade(decision) {
+  const { player, idx } = decision;
+  const tile = WNI_TILES[idx];
+  const level = wniUpgradeLevel(WNI.players[player], idx);
+  const nextLevel = level + 1;
+  const cost = wniUpgradeCost(idx);
+  const nextRent = wniRent(idx, nextLevel);
+  Swal.fire({
+    customClass: { popup: 'swal-popup', confirmButton: 'swal-confirm', cancelButton: 'swal-cancel' },
+    title: `🏗️ Upgrade ${tile.name}?`,
+    html: `<div class="wni-card-draw">
+      <strong class="wni-card-draw__title">Tingkat ${level} → ${nextLevel}</strong>
+      <p>Bangun aset ini lebih besar. Biaya upgrade <b>${wniMoney(cost)}</b>; sewa naik menjadi <b>${wniMoney(nextRent)}</b> setiap kali pemain lain mendarat di sini.</p>
+      <span class="wni-card-draw__amount">Saldo setelah upgrade: ${wniMoney(WNI.players[player].money - cost)}</span>
+    </div>`,
+    showCancelButton: true,
+    confirmButtonText: 'Upgrade',
+    cancelButtonText: 'Batal',
+    allowOutsideClick: false,
+    allowEscapeKey: false
+  }).then((result) => {
+    WNI.pendingDecision = null;
+    WNI.busy = false;
+    if (result.isConfirmed) {
+      if (!wniCanUpgrade(player, idx)) {
+        wniRender();
+        toast('Saldo atau status aset berubah; upgrade tidak dilakukan.');
+        return;
+      }
+      WNI.players[player].money -= cost;
+      WNI.players[player].upgrades[idx] = nextLevel;
+      wniLog('🏗️', `<strong>${wniName(player)}</strong> upgrade ${tile.name} ke tingkat ${nextLevel}`, `-${wniMoney(cost)} · sewa ${wniMoney(nextRent)}`, 'upgrade');
+      toast(`🏗️ ${tile.name} menjadi tingkat ${nextLevel}; sewa ${wniMoney(nextRent)}`);
+    }
+    wniRender();
+  });
 }
 
 function wniAfterAction(player) {
@@ -892,4 +1009,7 @@ $(function () {
   W.$ai.on('click', () => wniStart(true));
   W.$roll.on('click', wniPlayTurn);
   W.$reset.on('click', wniReset);
+  W.$players.on('click', '[data-wni-upgrade]', function () {
+    wniRequestUpgrade(Number(this.dataset.player), Number(this.dataset.wniUpgrade));
+  });
 });

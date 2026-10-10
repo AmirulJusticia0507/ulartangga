@@ -95,11 +95,12 @@ php -S localhost:8080
 2. Setiap pemain memulai dengan **Rp10.000.000** dan bergantian melempar dua dadu.
 3. Saat melewati petak Mulai, pilih **Terima** untuk menerima **Rp500.000**, atau **Batal** untuk melanjutkan tanpa bonus.
 4. Saat mendarat di properti kosong, pemain dapat membeli properti. Pemain lain yang mendarat di sana membayar sewa kepada pemilik.
-5. Papan WNI berbentuk **jalur keliling seperti sebelumnya**: 10 petak di tiap sisi (36 petak total karena petak sudut dipakai bersama), dengan area tengah tetap terbuka. Jalur dimulai dari START di sudut kiri bawah dan berjalan mengelilingi papan.
-6. Kartu **Kesempatan** dan **Dana Umum** membahas biaya hidup, MBG, Kopdes Merah Putih, dana haji, pajak, upah, dugaan korupsi, isu ijazah, dan proses pidana, perdata, serta tata negara. Skenarionya satir dan fiktif, bukan klaim tentang perkara nyata atau orang tertentu; dampaknya bisa menambah atau mengurangi saldo.
-7. Saldo yang tidak cukup untuk membayar kewajiban menyebabkan pemain bangkrut dan gugur. Jika tersisa satu pemain, pemain itu menang.
-8. Permainan tidak memiliki batas putaran. Pemain terakhir yang belum bangkrut menjadi pemenang; saldo dan kekayaan bersih tetap ditampilkan sebagai informasi.
-9. Progres WNI Simulator disimpan otomatis di browser yang sama dan dipulihkan setelah halaman dimuat ulang. Tombol reset menghapus simpanan tersebut.
+5. Pemain dapat meng-upgrade properti miliknya kapan saja dari daftar aset: maksimal **3 tingkat**, tiap tingkat berbiaya **50% dari harga beli awal**, dan sewa menjadi **2× lipat per tingkat**. Upgrade menambah nilai aset bersih; bangunan ditandai di papan.
+6. Papan WNI berbentuk **jalur keliling seperti sebelumnya**: 10 petak di tiap sisi (36 petak total karena petak sudut dipakai bersama), dengan area tengah tetap terbuka. Jalur dimulai dari START di sudut kiri bawah dan berjalan mengelilingi papan.
+7. Kartu **Kesempatan** dan **Dana Umum** membahas biaya hidup, MBG, Kopdes Merah Putih, dana haji, pajak, upah, dugaan korupsi, isu ijazah, dan proses pidana, perdata, serta tata negara. Skenarionya satir dan fiktif, bukan klaim tentang perkara nyata atau orang tertentu; dampaknya bisa menambah atau mengurangi saldo.
+8. Saldo yang tidak cukup untuk membayar kewajiban menyebabkan pemain bangkrut dan gugur. Jika tersisa satu pemain, pemain itu menang.
+9. Permainan tidak memiliki batas putaran. Pemain terakhir yang belum bangkrut menjadi pemenang; saldo dan kekayaan bersih tetap ditampilkan sebagai informasi.
+10. Progres WNI Simulator disimpan otomatis di browser yang sama dan dipulihkan setelah halaman dimuat ulang. Termasuk status upgrade dan modal upgrade yang sedang berjalan. Tombol reset menghapus simpanan tersebut.
 
 Bentuk jalur keliling mengambil inspirasi dari format board game roll-and-move yang dibahas
 [artikel RRI](https://rri.co.id/padang/hobi/2786368/mencoba-sensasi-bertahan-hidup-lewat-gim-wni-simulator)
