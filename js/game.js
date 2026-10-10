@@ -120,7 +120,7 @@ function movePlayer(player, total) {
  * Lanjutkan ke giliran pemain berikutnya
  */
 function nextTurn() {
-  STATE.currentPlayer = 1 - STATE.currentPlayer;
+  STATE.currentPlayer = (STATE.currentPlayer + 1) % STATE.players.length;
   render();
 
   if (STATE.isVsComputer && STATE.currentPlayer === 1) {
@@ -147,18 +147,20 @@ function playTurn() {
 /**
  * Mulai permainan baru
  */
-function startGame(vsComputer) {
+function startGame(vsComputer, playerCount = 2) {
   STATE.isVsComputer = vsComputer;
+  STATE.playerCount = playerCount;
   STATE.started = true;
   STATE.busy = false;
   STATE.gameOver = false;
-  STATE.players = [1, 1];
+  STATE.players = Array(playerCount).fill(1);
   STATE.currentPlayer = 0;
   STATE.logEntries = [];
   DOM.$log.html('<div class="empty-note">Belum ada gerakan.</div>');
   showDice(0, 0);
   render();
-  addLog('🎲', `Mode dimulai: <strong>${vsComputer ? 'Pemain 1 vs AI' : 'Pemain 1 vs Pemain 2'}</strong>`, '', 'start');
+  const modeName = vsComputer ? 'Pemain 1 vs AI' : `${playerCount} Pemain`;
+  addLog('🎲', `Mode dimulai: <strong>${modeName}</strong>`, '', 'start');
 }
 
 /**

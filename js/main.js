@@ -44,6 +44,7 @@ $(function () {
 
   // Mode Selection
   DOM.$pvpMode.on('click', () => startGame(false));
+  DOM.$fourPlayersMode.on('click', () => startGame(false, 4));
   DOM.$vsComputer.on('click', () => startGame(true));
 
   // Game Controls

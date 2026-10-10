@@ -12,6 +12,7 @@ const DOM = {
   $log: $('#logList'),
   $toastEl: $('#toast'),
   $pvpMode: $('#pvpMode'),
+  $fourPlayersMode: $('#fourPlayersMode'),
   $vsComputer: $('#vsComputer'),
   $rollDice: $('#rollDice'),
   $resetGame: $('#resetGame'),
@@ -33,22 +34,28 @@ const DOM = {
  * Dapatkan nama pemain berdasarkan index
  */
 function playerName(index) {
-  return index === 0 ? 'Pemain 1' : (STATE.isVsComputer ? 'AI Computer' : 'Pemain 2');
+  return STATE.isVsComputer && index === 1 ? 'AI Computer' : `Pemain ${index + 1}`;
 }
 
 /**
  * Dapatkan icon pemain berdasarkan index
  */
 function playerIcon(index) {
-  if (index === 0) return '🚗';
-  return STATE.isVsComputer ? '🤖' : '🏍️';
+  if (STATE.isVsComputer && index === 1) return '🤖';
+  return ['🚗', '🏍️', '🚀', '🚲'][index];
 }
 
 /**
  * Dapatkan variabel CSS warna pemain
  */
 function playerVar(index) {
-  return index === 0 ? 'var(--p1-a), var(--p1-b)' : (STATE.isVsComputer ? 'var(--ai-a), var(--ai-b)' : 'var(--p2-a), var(--p2-b)');
+  if (STATE.isVsComputer && index === 1) return 'var(--ai-a), var(--ai-b)';
+  return [
+    'var(--p1-a), var(--p1-b)',
+    'var(--p2-a), var(--p2-b)',
+    'var(--p3-a), var(--p3-b)',
+    'var(--p4-a), var(--p4-b)'
+  ][index];
 }
 
 /**

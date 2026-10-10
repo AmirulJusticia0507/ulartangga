@@ -42,11 +42,10 @@ function buildBoard() {
   }
   DOM.$board.html(html);
 
-  // Tambahkan token pemain
-  DOM.$board.append(
-    `<div class="token token--0" id="token0" style="top:2%; background:linear-gradient(140deg, var(--p1-a), var(--p1-b))" aria-hidden="true">🚗</div>`,
-    `<div class="token token--1" id="token1" style="top:2%; background:linear-gradient(140deg, var(--p2-a), var(--p2-b))" aria-hidden="true">🏍️</div>`
-  );
+  const icons = ['🚗', '🏍️', '🚀', '🚲'];
+  DOM.$board.append(icons.map((icon, i) =>
+    `<div class="token token--${i}" id="token${i}" aria-hidden="true">${icon}</div>`
+  ).join(''));
 }
 
 /**

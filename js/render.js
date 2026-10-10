@@ -7,8 +7,7 @@
  * Render daftar pemain di sidebar
  */
 function renderPlayers() {
-  const html = [0, 1].map((i) => {
-    const pos = STATE.players[i];
+  const html = STATE.players.map((pos, i) => {
     const vars = playerVar(i).split(', ');
     const active = STATE.started && !STATE.gameOver && i === STATE.currentPlayer;
     return `
@@ -16,7 +15,7 @@ function renderPlayers() {
       <div class="player-row__avatar" aria-hidden="true">${playerIcon(i)}</div>
       <div>
         <div class="player-row__name">${playerName(i)}</div>
-        <div class="player-row__meta">${STATE.isVsComputer && i === 1 ? 'Komputer' : i === 0 ? 'Kendali kiri' : 'Kendali kanan'}</div>
+        <div class="player-row__meta">${STATE.isVsComputer && i === 1 ? 'Komputer' : `Pemain ${i + 1}`}</div>
         <div class="bar"><div class="bar__fill" style="width:${pos}%"></div></div>
       </div>
       <div class="player-row__pos">${pos}<small>/100</small></div>
@@ -39,7 +38,7 @@ function renderLeaderboard() {
     const gap = leader - entry.pos;
     return `
     <div class="rank-item${rank === 0 ? ' lead' : ''}" style="--c1:${vars[0]}; --c2:${vars[1]}">
-      <span class="rank-item__medal" aria-hidden="true">${['🥇', '🥈'][rank]}</span>
+      <span class="rank-item__medal" aria-hidden="true">${['🥇', '🥈', '🥉', '4️⃣'][rank]}</span>
       <span class="rank-item__avatar" aria-hidden="true">${playerIcon(entry.index)}</span>
       <span>
         ${playerName(entry.index)}
@@ -57,6 +56,8 @@ function renderTokens() {
   DOM.$board.find('.token').each(function () {
     const player = +this.id.replace('token', '');
     const $t = $(this);
+    $t.toggle(STATE.players[player] !== undefined);
+    if (STATE.players[player] === undefined) return;
     if ($t.attr('data-host') !== String(STATE.players[player])) {
       DOM.$cell(STATE.players[player]).append($t);
       $t.attr('data-host', STATE.players[player]);
@@ -99,8 +100,9 @@ function renderTurn() {
 function renderControls() {
   DOM.$rollDice.prop('disabled', !STATE.started || STATE.busy || STATE.gameOver);
   DOM.$resetGame.prop('disabled', !STATE.started);
-  DOM.$pvpMode.add(DOM.$vsComputer).prop('disabled', STATE.started);
-  DOM.$pvpMode.attr('aria-pressed', String(STATE.started && !STATE.isVsComputer));
+  DOM.$pvpMode.add(DOM.$fourPlayersMode).add(DOM.$vsComputer).prop('disabled', STATE.started);
+  DOM.$pvpMode.attr('aria-pressed', String(STATE.started && !STATE.isVsComputer && STATE.playerCount === 2));
+  DOM.$fourPlayersMode.attr('aria-pressed', String(STATE.started && !STATE.isVsComputer && STATE.playerCount === 4));
   DOM.$vsComputer.attr('aria-pressed', String(STATE.started && STATE.isVsComputer));
   DOM.$boardHint.toggleClass('is-hidden', STATE.started);
 }

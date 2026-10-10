@@ -1,7 +1,7 @@
 /**
  * WNI SIMULATOR
  * Mode boardgame satir roll-and-move: kelola dana bansos, beli aset,
- * hadapi Kartu Musibah/Takdir dan penyitaan aset oleh negara.
+ * hadapi Kartu Kesempatan/Dana Umum dan penyitaan aset oleh negara.
  */
 
 const WNI_CONFIG = {
@@ -21,43 +21,47 @@ const WNI_TILES = [
   { type: 'start',     name: 'Start · Kelurahan',  emoji: '🏁' },
   { type: 'property',  name: 'Warung Kopi',        emoji: '☕', price: 600000,  rent: 120000 },
   { type: 'property',  name: 'Kos-Kosan',          emoji: '🏠', price: 900000,  rent: 180000 },
-  { type: 'musibah',   name: 'Kartu Musibah',      emoji: '🃏' },
+  { type: 'kesempatan', name: 'Kartu Kesempatan',   emoji: '🎴' },
   { type: 'property',  name: 'Angkot',             emoji: '🚐', price: 750000,  rent: 150000 },
-  { type: 'takdir',    name: 'Kartu Takdir',       emoji: '✨' },
+  { type: 'dana-umum', name: 'Dana Umum',          emoji: '🏛️' },
   { type: 'property',  name: 'KRL Commuter',       emoji: '🚆', price: 1200000, rent: 240000 },
   { type: 'pajak',     name: 'Pajak & Retribusi',  emoji: '🧾' },
   { type: 'property',  name: 'Pasar Tradisional',  emoji: '🥬', price: 800000,  rent: 160000 },
   { type: 'property',  name: 'Warnet',             emoji: '🖥️', price: 700000,  rent: 140000 },
   { type: 'bebas',     name: 'Nongkrong Bebas',    emoji: '🛖' },
-  { type: 'musibah',   name: 'Kartu Musibah',      emoji: '🃏' },
+  { type: 'kesempatan', name: 'Kartu Kesempatan',  emoji: '🎴' },
   { type: 'property',  name: 'Toko Kelontong',     emoji: '🏪', price: 650000,  rent: 130000 },
   { type: 'property',  name: 'Laundry Kiloan',     emoji: '🧺', price: 850000,  rent: 170000 },
-  { type: 'takdir',    name: 'Kartu Takdir',       emoji: '✨' },
+  { type: 'dana-umum', name: 'Dana Umum',          emoji: '🏛️' },
   { type: 'property',  name: 'Kontrakan',          emoji: '🚪', price: 1000000, rent: 200000 },
   { type: 'penyitaan', name: 'Sita Aset Negara',   emoji: '🚫' },
   { type: 'property',  name: 'Klinik 24 Jam',      emoji: '🏥', price: 1100000, rent: 220000 },
   { type: 'property',  name: 'Warung Tegal',       emoji: '🍛', price: 550000,  rent: 110000 },
-  { type: 'musibah',   name: 'Kartu Musibah',      emoji: '🃏' }
+  { type: 'kesempatan', name: 'Kartu Kesempatan',  emoji: '🎴' }
 ];
 
-const WNI_MUSIBAH = [
-  { icon: '🚦', text: 'ditilang online (ETLE)',                    delta: -250000 },
-  { icon: '🚗', text: 'terjebak macet 3 jam, bensin boros',        delta: -120000 },
-  { icon: '👮', text: 'kena razia gabungan',                        delta: -200000 },
-  { icon: '💡', text: 'tagihan listrik & air melonjak',            delta: -300000 },
-  { icon: '📱', text: 'HP dicopet di angkot',                       delta: -750000 },
-  { icon: '💊', text: 'anak demam, ke klinik',                     delta: -350000 },
-  { icon: '☔', text: 'atap kontrakan bocor',                       delta: -400000 },
-  { icon: '🗣️', text: 'ditanya "kapan nikah" pas Lebaran',         delta: -100000 }
+const WNI_CHANCE_CARDS = [
+  { icon: '⚖️', title: 'Bukti bicara', text: 'Gugatan perdata diputus berdasarkan bukti, bukan kedekatan. Ganti rugi cair.', delta: 450000 },
+  { icon: '🧾', title: 'Kuitansi lengkap', text: 'Kamu menolak pungutan tanpa dasar dan meminta prosedur resmi. Hemat biaya siluman.', delta: 200000 },
+  { icon: '📣', title: 'Layanan jadi viral', text: 'Keluhan warga ramai dibicarakan. Berkas yang tertahan akhirnya diproses tanpa jalur khusus.', delta: 250000 },
+  { icon: '🚧', title: 'Jalan pintas berbayar', text: 'Ada yang menawarkan urusan dipercepat asal “tahu sama tahu”. Kamu menolak; jalur resmi makan waktu dan ongkos.', delta: -150000 },
+  { icon: '🗳️', title: 'Warga ikut mengawasi', text: 'Partisipasi publik memperbaiki keputusan tata kota. Kompensasi warga dibayarkan.', delta: 350000 },
+  { icon: '📜', title: 'Aturan berubah mendadak', text: 'Syarat baru muncul setelah berkas hampir selesai. Fotokopi, transport, dan kesabaran terkuras.', delta: -200000 },
+  { icon: '🛠️', title: 'Proyek akhirnya selesai', text: 'Setelah berkali-kali molor, akses jalan dibuka. Ongkos harianmu berkurang.', delta: 180000 },
+  { icon: '🤝', title: 'Solidaritas tetangga', text: 'Warga patungan membantu biaya berobat dan konsultasi hukum.', delta: 300000 },
+  { icon: '🔎', title: 'Data terbuka', text: 'Informasi anggaran mudah diakses. Hak bantuanmu terverifikasi dan cair.', delta: 400000 },
+  { icon: '🧑‍⚖️', title: 'Putusan dikoreksi', text: 'Upaya hukum berhasil mengoreksi keputusan yang merugikanmu.', delta: 500000 }
 ];
 
-const WNI_TAKDIR = [
-  { icon: '🎁', text: 'dapat THR dari bos',        delta: 400000 },
-  { icon: '🎉', text: 'menang giveaway HP',         delta: 600000 },
-  { icon: '🍰', text: 'jualan kue online laris',    delta: 300000 },
-  { icon: '💼', text: 'proyek freelance cair',      delta: 800000 },
-  { icon: '🏅', text: 'bonus kinerja tahunan',      delta: 500000 },
-  { icon: '💸', text: 'ditraktir oom pas mudik',    delta: 150000 }
+const WNI_PUBLIC_FUND_CARDS = [
+  { icon: '🏗️', title: 'Proyek mangkrak', text: 'Jalan dibongkar, tak kunjung selesai. Kendaraan rusak dan ongkos membengkak.', delta: -250000 },
+  { icon: '📑', title: 'Berkas bolak-balik', text: 'Syarat berubah di tengah proses. Kamu kehilangan waktu kerja dan ongkos perjalanan.', delta: -180000 },
+  { icon: '⚖️', title: 'Sidang ditunda lagi', text: 'Perkara perdata mundur tanpa kepastian. Ongkos transport dan cuti kerja terbuang.', delta: -220000 },
+  { icon: '🧮', title: 'Pungutan berlapis', text: 'Tagihan administrasi muncul satu per satu. Kamu meminta dasar hukum, tetapi waktu tetap habis.', delta: -300000 },
+  { icon: '🌧️', title: 'Tata ruang amburadul', text: 'Banjir merendam kontrakan. Perabot dan barang dagangan rusak.', delta: -400000 },
+  { icon: '📰', title: 'Anggaran jadi bahan debat', text: 'Warga menunggu layanan, pejabat sibuk saling lempar tanggung jawab. Kamu nombok kebutuhan dasar.', delta: -200000 },
+  { icon: '🕵️', title: 'Audit menemukan kejanggalan', text: 'Pengadaan fiktif dalam skenario permainan terbongkar. Dana publik yang tertahan dikembalikan ke warga.', delta: 350000 },
+  { icon: '🧑‍⚖️', title: 'Hak warga dipulihkan', text: 'Pengujian aturan mengoreksi kebijakan yang merugikan warga. Bantuan hukum kolektif menutup sebagian biaya.', delta: 250000 }
 ];
 
 /* ------------------------------------------------------------------ state */
@@ -67,7 +71,7 @@ const WNI = {
 
 let wniAiTimer = 0;
 
-function wniResetState() {
+function wniResetState(playerCount = 2) {
   clearTimeout(wniAiTimer);
   WNI.started = false;
   WNI.isVsComputer = false;
@@ -75,11 +79,14 @@ function wniResetState() {
   WNI.gameOver = false;
   WNI.currentPlayer = 0;
   WNI.turnCount = 0;
+  WNI.playerCount = playerCount;
   WNI.owners = {};
-  WNI.players = [
-    { money: WNI_CONFIG.START_MONEY, pos: 0, props: [] },
-    { money: WNI_CONFIG.START_MONEY, pos: 0, props: [] }
-  ];
+  WNI.players = Array.from({ length: playerCount }, () => ({
+    money: WNI_CONFIG.START_MONEY,
+    pos: 0,
+    props: [],
+    eliminated: false
+  }));
   WNI.log = [];
 }
 wniResetState();
@@ -96,6 +103,7 @@ const W = {
   $roll: $('#wniRoll'),
   $reset: $('#wniReset'),
   $pvp: $('#wniPvpMode'),
+  $four: $('#wniFourMode'),
   $ai: $('#wniAiMode'),
   $turnBadge: $('#wniTurnBadge'),
   $turnName: $('#wniTurnName'),
@@ -114,14 +122,20 @@ function wniShort(n) {
   return 'Rp' + Math.round(n / 1000) + 'rb';
 }
 function wniName(i) {
-  return i === 0 ? 'Pemain 1' : (WNI.isVsComputer ? 'AI Tetangga' : 'Pemain 2');
+  return WNI.isVsComputer && i === 1 ? 'AI Tetangga' : `Pemain ${i + 1}`;
 }
 function wniIcon(i) {
-  return i === 0 ? '🧑' : (WNI.isVsComputer ? '🤖' : '👩');
+  if (WNI.isVsComputer && i === 1) return '🤖';
+  return ['🧑', '👩', '🧑‍🚀', '🚴'][i];
 }
 function wniVar(i) {
-  return i === 0 ? 'var(--p1-a), var(--p1-b)'
-                 : (WNI.isVsComputer ? 'var(--ai-a), var(--ai-b)' : 'var(--p2-a), var(--p2-b)');
+  if (WNI.isVsComputer && i === 1) return 'var(--ai-a), var(--ai-b)';
+  return [
+    'var(--p1-a), var(--p1-b)',
+    'var(--p2-a), var(--p2-b)',
+    'var(--p3-a), var(--p3-b)',
+    'var(--p4-a), var(--p4-b)'
+  ][i];
 }
 function wniNet(i) {
   return WNI.players[i].money + WNI.players[i].props.reduce((s, idx) => s + WNI_TILES[idx].price, 0);
@@ -161,8 +175,9 @@ function wniBuildBoard() {
     </div>`;
   });
 
-  html += `<div class="wni-token wni-token--0" id="wniToken0" aria-hidden="true">🧑</div>
-           <div class="wni-token wni-token--1" id="wniToken1" aria-hidden="true">👩</div>`;
+  html += ['🧑', '👩', '🧑‍🚀', '🚴'].map((icon, i) =>
+    `<div class="wni-token wni-token--${i}" id="wniToken${i}" aria-hidden="true">${icon}</div>`
+  ).join('');
 
   W.$board.html(html);
 }
@@ -171,6 +186,8 @@ function wniRenderTokens() {
   W.$board.find('.wni-token').each(function () {
     const player = +this.id.replace('wniToken', '');
     const $t = $(this);
+    $t.toggle(WNI.players[player] !== undefined);
+    if (WNI.players[player] === undefined) return;
     const pos = WNI.players[player].pos;
     if ($t.attr('data-host') !== String(pos)) {
       $('#wniTile' + pos).append($t);
@@ -180,13 +197,14 @@ function wniRenderTokens() {
     $t.css('background', `linear-gradient(140deg, ${wniVar(player)})`);
     $t.toggleClass('is-turn', WNI.started && !WNI.gameOver && player === WNI.currentPlayer);
   });
-  W.$board.find('.wni-tile').removeClass('is-here-0 is-here-1 is-owned-0 is-owned-1');
+  W.$board.find('.wni-tile').removeClass('is-here-0 is-here-1 is-here-2 is-here-3 is-owned-0 is-owned-1 is-owned-2 is-owned-3');
   W.$board.find('.wni-tile__owner').text('');
-  [0, 1].forEach((i) => {
-    $('#wniTile' + WNI.players[i].pos).addClass('is-here-' + i);
-    WNI.players[i].props.forEach((idx) => {
+  WNI.players.forEach((player, i) => {
+    $('#wniTile' + player.pos).addClass('is-here-' + i);
+    player.props.forEach((idx) => {
       const $tile = $('#wniTile' + idx);
       $tile.addClass('is-owned-' + i);
+      $tile.find('.wni-tile__owner').css('color', wniVar(i).split(', ')[0]);
       $tile.find('.wni-tile__owner').text('P' + (i + 1));
     });
   });
@@ -194,8 +212,7 @@ function wniRenderTokens() {
 
 /* ------------------------------------------------------------------ render */
 function wniRenderPlayers() {
-  W.$players.html([0, 1].map((i) => {
-    const p = WNI.players[i];
+  W.$players.html(WNI.players.map((p, i) => {
     const active = WNI.started && !WNI.gameOver && i === WNI.currentPlayer;
     const vars = wniVar(i).split(', ');
     const low = p.money < WNI_CONFIG.LOW_MONEY;
@@ -204,7 +221,7 @@ function wniRenderPlayers() {
       <div class="player-row__avatar" aria-hidden="true">${wniIcon(i)}</div>
       <div>
         <div class="player-row__name">${wniName(i)}</div>
-        <div class="player-row__meta">${i === 0 ? 'Kendali kiri' : (WNI.isVsComputer ? 'Komputer' : 'Kendali kanan')} · ${WNI_TILES[p.pos].emoji} ${WNI_TILES[p.pos].name}</div>
+        <div class="player-row__meta">${WNI.isVsComputer && i === 1 ? 'Komputer' : `Pemain ${i + 1}`} · ${WNI_TILES[p.pos].emoji} ${WNI_TILES[p.pos].name}${p.eliminated ? ' · Gugur' : ''}</div>
         ${assets ? `<div class="wni-assets">${assets}</div>` : ''}
       </div>
       <div class="wni-money${low ? ' is-low' : ''}">${wniMoney(p.money)}<small>net ${wniMoney(wniNet(i))}</small></div>
@@ -213,20 +230,20 @@ function wniRenderPlayers() {
 }
 
 function wniRenderNetworth() {
-  const values = [wniNet(0), wniNet(1)];
-  const max = Math.max(values[0], values[1], 1);
-  W.$networth.html([0, 1].map((i) => {
+  const values = WNI.players.map((_, i) => wniNet(i));
+  const max = Math.max(...values, 1);
+  W.$networth.html(values.map((value, i) => {
     const vars = wniVar(i).split(', ');
-    const pct = Math.max(3, Math.round((values[i] / max) * 100));
+    const pct = Math.max(3, Math.round((value / max) * 100));
     return `<div class="wni-net-item" style="--c1:${vars[0]};--c2:${vars[1]}">
       <span class="wni-net-item__dot" aria-hidden="true"></span>
       <span class="wni-net-item__bar"><span class="wni-net-item__fill" style="width:${pct}%"></span></span>
-      <span class="wni-net-item__val">${wniMoney(values[i])}</span>
+      <span class="wni-net-item__val">${WNI.players[i].eliminated ? 'Gugur · ' : ''}${wniMoney(value)}</span>
     </div>`;
   }).join(''));
 
   if (WNI.started) {
-    const round = Math.min(Math.floor(WNI.turnCount / 2) + 1, WNI_CONFIG.TOTAL_ROUNDS);
+    const round = Math.min(WNI.turnCount + 1, WNI_CONFIG.TOTAL_ROUNDS);
     W.$round.text(`Putaran ${round}/${WNI_CONFIG.TOTAL_ROUNDS}`);
   } else {
     W.$round.text(`Putaran 0/${WNI_CONFIG.TOTAL_ROUNDS}`);
@@ -238,7 +255,7 @@ function wniRenderTurn() {
   if (centerStatus) {
     centerStatus.textContent = !WNI.started
       ? 'Dana bansos menanti...'
-      : `Putaran ${Math.min(Math.floor(WNI.turnCount / 2) + 1, WNI_CONFIG.TOTAL_ROUNDS)}/${WNI_CONFIG.TOTAL_ROUNDS} · ${WNI.players[WNI.currentPlayer].money < WNI_CONFIG.LOW_MONEY ? 'Saldo menipis!' : 'Tetap bertahan!'}`;
+      : `Putaran ${Math.min(WNI.turnCount + 1, WNI_CONFIG.TOTAL_ROUNDS)}/${WNI_CONFIG.TOTAL_ROUNDS} · ${WNI.players[WNI.currentPlayer].money < WNI_CONFIG.LOW_MONEY ? 'Saldo menipis!' : 'Tetap bertahan!'}`;
   }
   if (!WNI.started || WNI.gameOver) {
     W.$turnBadge.css('--c1', 'var(--muted)');
@@ -253,8 +270,9 @@ function wniRenderControls() {
   const humanTurn = !(WNI.isVsComputer && WNI.currentPlayer === 1);
   W.$roll.prop('disabled', !WNI.started || WNI.busy || WNI.gameOver || !humanTurn);
   W.$reset.prop('disabled', !WNI.started);
-  W.$pvp.add(W.$ai).prop('disabled', WNI.started);
-  W.$pvp.attr('aria-pressed', String(WNI.started && !WNI.isVsComputer));
+  W.$pvp.add(W.$four).add(W.$ai).prop('disabled', WNI.started);
+  W.$pvp.attr('aria-pressed', String(WNI.started && !WNI.isVsComputer && WNI.playerCount === 2));
+  W.$four.attr('aria-pressed', String(WNI.started && !WNI.isVsComputer && WNI.playerCount === 4));
   W.$ai.attr('aria-pressed', String(WNI.started && WNI.isVsComputer));
   W.$hint.toggleClass('is-hidden', WNI.started);
 }
@@ -382,20 +400,12 @@ function wniResolveTile(player) {
     return wniAfterAction(player);
   }
 
-  if (tile.type === 'musibah') {
-    const c = wniPick(WNI_MUSIBAH);
-    p.money += c.delta;
-    toast(`${c.icon} ${wniName(player)} ${c.text}`);
-    wniLog(c.icon, `${wniName(player)} ${c.text}`, wniMoney(c.delta), 'musibah');
-    return wniAfterAction(player);
+  if (tile.type === 'kesempatan') {
+    return wniDrawCard(player, WNI_CHANCE_CARDS, 'Kartu Kesempatan', 'kesempatan');
   }
 
-  if (tile.type === 'takdir') {
-    const c = wniPick(WNI_TAKDIR);
-    p.money += c.delta;
-    toast(`${c.icon} ${wniName(player)} ${c.text}`);
-    wniLog(c.icon, `${wniName(player)} ${c.text}`, '+' + wniMoney(c.delta), 'takdir');
-    return wniAfterAction(player);
+  if (tile.type === 'dana-umum') {
+    return wniDrawCard(player, WNI_PUBLIC_FUND_CARDS, 'Dana Umum', 'dana-umum');
   }
 
   if (tile.type === 'pajak') {
@@ -424,6 +434,36 @@ function wniResolveTile(player) {
   // start / bebas
   wniLog('✅', `${wniName(player)} aman di ${tile.name}`, '', 'self');
   return wniAfterAction(player);
+}
+
+function wniDrawCard(player, deck, deckName, logType) {
+  const card = wniPick(deck);
+  const amount = Math.abs(card.delta);
+  const change = card.delta < 0 ? `−${wniMoney(amount)}` : `+${wniMoney(amount)}`;
+  const playerNameText = wniName(player);
+  WNI.players[player].money += card.delta;
+  wniLog(card.icon, `<strong>${playerNameText}</strong> mengambil ${deckName}: ${card.title}`, change, logType);
+  wniRender();
+
+  if (WNI.isVsComputer && player === 1) {
+    toast(`${card.icon} ${playerNameText}: ${card.title} (${change})`);
+    return wniAfterAction(player);
+  }
+
+  Swal.fire({
+    customClass: { popup: 'swal-popup', confirmButton: 'swal-confirm' },
+    title: `${card.icon} ${deckName}`,
+    html: `<div class="wni-card-draw">
+      <strong class="wni-card-draw__title">${card.title}</strong>
+      <p>${card.text}</p>
+      <span class="wni-card-draw__amount${card.delta < 0 ? ' is-loss' : ''}">${change}</span>
+      <small>Skenario fiktif untuk permainan; tidak merujuk pada orang atau perkara tertentu.</small>
+    </div>`,
+    confirmButtonText: 'Lanjut'
+  }).then(() => {
+    toast(`${card.icon} ${playerNameText}: ${card.title} (${change})`);
+    wniAfterAction(player);
+  });
 }
 
 function wniAskBuy(player, idx) {
@@ -460,17 +500,28 @@ function wniAfterAction(player) {
   WNI.busy = false;
   if (WNI.players[player].money < 0) {
     WNI.players[player].money = 0;
-    return wniGameOver(1 - player, `${wniName(player)} bangkrut!`);
+    WNI.players[player].eliminated = true;
+    wniLog('💸', `<strong>${wniName(player)}</strong> bangkrut dan gugur`, '', 'skip');
   }
   wniNextTurn();
 }
 
 function wniNextTurn() {
-  WNI.turnCount++;
-  const round = Math.floor(WNI.turnCount / 2) + 1;
-  if (round > WNI_CONFIG.TOTAL_ROUNDS) return wniEndByNetworth();
+  const remainingPlayers = WNI.players.filter((player) => !player.eliminated);
+  if (remainingPlayers.length <= 1) {
+    return remainingPlayers.length
+      ? wniGameOver(WNI.players.indexOf(remainingPlayers[0]), 'Pemain lain bangkrut.')
+      : wniEndByNetworth();
+  }
 
-  WNI.currentPlayer = 1 - WNI.currentPlayer;
+  const previousPlayer = WNI.currentPlayer;
+  do {
+    WNI.currentPlayer = (WNI.currentPlayer + 1) % WNI.playerCount;
+  } while (WNI.players[WNI.currentPlayer].eliminated);
+  if (WNI.currentPlayer <= previousPlayer) {
+    WNI.turnCount++;
+    if (WNI.turnCount >= WNI_CONFIG.TOTAL_ROUNDS) return wniEndByNetworth();
+  }
   wniRender();
 
   if (WNI.isVsComputer && WNI.currentPlayer === 1) {
@@ -482,9 +533,15 @@ function wniNextTurn() {
 function wniEndByNetworth() {
   WNI.gameOver = true;
   WNI.busy = false;
-  const net = [wniNet(0), wniNet(1)];
-  if (net[0] === net[1]) return wniGameOver(-1, 'Seri! Kekayaan imbang.');
-  return wniGameOver(net[0] > net[1] ? 0 : 1, 'Delapan putaran berlalu.');
+  const activePlayers = WNI.players.map((player, i) => ({ i, net: wniNet(i) }))
+    .filter(({ i }) => !WNI.players[i].eliminated);
+  const active = activePlayers.length
+    ? activePlayers
+    : WNI.players.map((player, i) => ({ i, net: wniNet(i) }));
+  const highest = Math.max(...active.map(({ net }) => net));
+  const winners = active.filter(({ net }) => net === highest);
+  if (winners.length > 1) return wniGameOver(-1, 'Seri! Kekayaan imbang.');
+  return wniGameOver(winners[0].i, `${WNI_CONFIG.TOTAL_ROUNDS} putaran berlalu.`);
 }
 
 function wniGameOver(winner, reason) {
@@ -492,14 +549,14 @@ function wniGameOver(winner, reason) {
   WNI.gameOver = true;
   WNI.busy = false;
   wniRender();
-  const net = [wniNet(0), wniNet(1)];
+  const net = WNI.players.map((_, i) => wniNet(i));
 
   if (winner < 0) {
     wniLog('🤝', 'Permainan berakhir <strong>seri</strong>', '', 'self');
     Swal.fire({
       customClass: { popup: 'swal-popup', confirmButton: 'swal-confirm' },
       title: '🤝 Seri!',
-      html: `<p style="margin:6px 0 0;color:var(--muted)">${reason} Kekayaan keduanya imbang.</p>`,
+      html: `<p style="margin:6px 0 0;color:var(--muted)">${reason} Kekayaan semua pemain imbang.</p>`,
       confirmButtonText: 'Main Lagi'
     }).then(() => wniReset());
     return;
@@ -517,15 +574,16 @@ function wniGameOver(winner, reason) {
 }
 
 /* -------------------------------------------------------------- lifecycle */
-function wniStart(vsComputer) {
-  wniResetState();
+function wniStart(vsComputer, playerCount = 2) {
+  wniResetState(playerCount);
   WNI.isVsComputer = vsComputer;
   WNI.started = true;
   wniShowDice(0, 0);
   W.$log.html('<div class="empty-note">Belum ada gerakan.</div>');
   wniRender();
-  wniLog('🧭', `Mode dimulai: <strong>${vsComputer ? 'Pemain 1 vs AI Tetangga' : 'Pemain 1 vs Pemain 2'}</strong>`, '', 'start');
-  toast(vsComputer ? '🤖 Lawan AI Tetangga. Semoga kuat!' : '👥 Mode 2 pemain dimulai!');
+  const modeName = vsComputer ? 'Pemain 1 vs AI Tetangga' : `${playerCount} Pemain`;
+  wniLog('🧭', `Mode dimulai: <strong>${modeName}</strong>`, '', 'start');
+  toast(vsComputer ? '🤖 Lawan AI Tetangga. Semoga kuat!' : `👥 Mode ${playerCount} pemain dimulai!`);
 }
 
 function wniReset() {
@@ -542,6 +600,7 @@ $(function () {
   wniRender();
 
   W.$pvp.on('click', () => wniStart(false));
+  W.$four.on('click', () => wniStart(false, 4));
   W.$ai.on('click', () => wniStart(true));
   W.$roll.on('click', wniPlayTurn);
   W.$reset.on('click', wniReset);

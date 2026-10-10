@@ -52,7 +52,7 @@ Menyimpan semua konfigurasi permainan:
 
 #### state.js
 State management permainan:
-- `players`: Posisi kedua pemain
+- `players`: Posisi para pemain (2 atau 4 pemain)
 - `currentPlayer`: Index pemain yang aktif
 - `isVsComputer`: Flag mode AI
 - `started`, `busy`, `gameOver`: Status game

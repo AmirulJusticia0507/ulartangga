@@ -4,14 +4,15 @@
  */
 
 const STATE = {
-  // Posisi pemain [pemain1, pemain2]
+  // Posisi seluruh pemain pada papan
   players: [1, 1],
 
-  // Index pemain yang sedang bermain (0 atau 1)
+  // Index pemain yang sedang bermain
   currentPlayer: 0,
 
   // Mode permainan
   isVsComputer: false,
+  playerCount: 2,
 
   // Status permainan
   started: false,
@@ -29,6 +30,7 @@ const STATE = {
     this.players = [1, 1];
     this.currentPlayer = 0;
     this.isVsComputer = false;
+    this.playerCount = 2;
     this.started = false;
     this.busy = false;
     this.gameOver = false;
@@ -39,6 +41,7 @@ const STATE = {
   resetGame() {
     this.players = [1, 1];
     this.currentPlayer = 0;
+    this.playerCount = 2;
     this.started = false;
     this.busy = false;
     this.gameOver = false;

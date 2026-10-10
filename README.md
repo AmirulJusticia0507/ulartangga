@@ -1,7 +1,7 @@
 # 🎲 Game Ular Tangga (Snake 'n Ladder)
 
 Permainan web dengan dua mode yang dapat ditukar dari tombol di header: Ular Tangga dan
-WNI Simulator. Keduanya mendukung dua pemain atau permainan melawan AI.
+WNI Simulator. Keduanya mendukung 2 atau 4 pemain lokal, serta permainan melawan AI.
 
 Proyek ini statis — tanpa build step, tanpa backend. Cukup buka `index.html` di browser.
 
@@ -26,12 +26,13 @@ Proyek ini statis — tanpa build step, tanpa backend. Cukup buka `index.html` d
 | Fitur | Keterangan |
 | --- | --- |
 | 🧑‍🤝‍🧑 **Mode 2 Pemain** | Dua pemain bergantian melempar dadu di perangkat yang sama. |
+| 👥 **Mode 4 Pemain** | Empat pemain bergantian bermain di perangkat yang sama pada kedua game. |
 | 🤖 **Mode Vs AI** | Lawan dikendalikan AI dan bergerak otomatis setelah giliran pemain pertama. |
 | 🎲 **Dua dadu sungguhan** | Angka dadu digambar sebagai titik (pip) di grid 3x3, lengkap dengan animasi goyang. |
 | 🐍 **Ular** | Pemain yang mendarat di kepala ular turun mengikuti ular. |
 | 🪜 **Tangga** | Pemain yang mendarat di kaki tangga naik mengikuti tangga. |
 | 🎨 **Ular & tangga digambar** | Tubuh ular & rel tangga digambar dengan SVG (gradient + pattern sisik), kepala dan kaki memakai aset `ular.png` / `tangga.png`. |
-| 🏆 **Leaderboard langsung** | Peringkat kedua pemain beserta selisih posisi, diperbarui tiap giliran. |
+| 🏆 **Leaderboard langsung** | Peringkat semua pemain beserta selisih posisi, diperbarui tiap giliran. |
 | 📜 **Riwayat gerakan** | 12 gerakan terakhir (melangkah, naik tangga, digigit ular, melewati 100). |
 | 💡 **Tooltip papan** | Arahkan kursor ke kotak ular/tangga/finish untuk melihat informasi kotak tersebut. |
 | 🎮 **Petunjuk bermain** | Kartu panduan di sidebar untuk pemain baru. |
@@ -40,7 +41,7 @@ Proyek ini statis — tanpa build step, tanpa backend. Cukup buka `index.html` d
 | 🎉 **Konfeti + modal kemenangan** | Efek konfeti dan modal beri tema yang senada dengan tema halaman. |
 | 📱 **Responsif** | Papan mengikuti lebar container, selalu persegi, dan tidak pernah overflow — dari 320px sampai layar lebar. |
 | 🔀 **Switch game** | Berpindah antara Ular Tangga dan WNI Simulator tanpa memuat ulang halaman. |
-| 🇮🇩 **WNI Simulator** | Board 20 petak melingkar, ekonomi bansos, properti/sewa, kartu Takdir/Musibah, penyitaan, AI, bangkrut, dan penentuan pemenang setelah 8 putaran. |
+| 🇮🇩 **WNI Simulator** | Board 20 petak melingkar, ekonomi bansos, properti/sewa, dek Kesempatan dan Dana Umum satir, penyitaan, AI, bangkrut, dan penentuan pemenang setelah 8 putaran. |
 
 ---
 
@@ -80,7 +81,7 @@ php -S localhost:8080
 
 ## 🎯 Aturan Main — Ular Tangga
 
-1. Pilih mode: **2 Pemain** atau **Vs AI**.
+1. Pilih mode: **2 Pemain**, **4 Pemain**, atau **Vs AI**.
 2. Klik **Lempar Dadu** (atau tekan `Spasi`) untuk mengundi 2 dadu.
 3. Jumlah kedua dadu ditambahkan ke posisi pemain.
 4. Jika mendarat di **kepala ular**, pemain turun mengikuti ular.
@@ -90,13 +91,13 @@ php -S localhost:8080
 
 ## 🇮🇩 Aturan Main — WNI Simulator
 
-1. Gunakan tombol **WNI Simulator** di header, lalu pilih **2 Pemain** atau **Vs AI**.
+1. Gunakan tombol **WNI Simulator** di header, lalu pilih **2 Pemain**, **4 Pemain**, atau **Vs AI**.
 2. Setiap pemain memulai dengan **Rp3.000.000** dan bergantian melempar dua dadu.
 3. Lewati petak Mulai untuk menerima **Rp500.000**.
 4. Saat mendarat di properti kosong, pemain dapat membeli properti. Pemain lain yang mendarat di sana membayar sewa kepada pemilik.
-5. Petak pajak, Kartu Takdir, Kartu Musibah, dan Penyitaan dapat menambah atau mengurangi dana maupun aset.
-6. Saldo yang tidak cukup untuk membayar kewajiban menyebabkan pemain bangkrut dan lawan menang.
-7. Jika tidak ada yang bangkrut, kekayaan bersih tertinggi setelah **8 putaran penuh** menjadi pemenang. Nilai kekayaan bersih adalah saldo tunai ditambah harga beli aset.
+5. Kartu **Kesempatan** dan **Dana Umum** berisi kejadian satir seputar biaya hidup, layanan publik, korupsi dalam skenario rekaan, serta proses pidana, perdata, dan tata negara. Baca kartu sampai selesai: dampaknya bisa menambah atau mengurangi saldo.
+6. Saldo yang tidak cukup untuk membayar kewajiban menyebabkan pemain bangkrut dan gugur. Jika tersisa satu pemain, pemain itu menang.
+7. Jika masih ada beberapa pemain, kekayaan bersih tertinggi setelah **8 putaran penuh** menjadi pemenang. Nilai kekayaan bersih adalah saldo tunai ditambah harga beli aset.
 
 Susunan jalur keliling mengambil inspirasi dari format board game roll-and-move yang dibahas
 [artikel RRI](https://rri.co.id/padang/hobi/2786368/mencoba-sensasi-bertahan-hidup-lewat-gim-wni-simulator)
@@ -184,7 +185,7 @@ serta switch game.
 ### State permainan (`js/state.js`)
 
 ```js
-players: [1, 1],        // posisi pemain 1 & 2
+players: [1, 1],        // posisi pemain aktif (2 atau 4 pemain)
 currentPlayer: 0,       // giliran aktif (0 = pemain 1)
 isVsComputer: false,    // mode permainan
 started / busy / gameOver
