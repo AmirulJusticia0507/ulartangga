@@ -12,7 +12,6 @@ const WNI_CONFIG = {
   LOW_MONEY: 500000,
   PAJAK: 300000,
   DENDA_SITA: 500000,
-  TOTAL_ROUNDS: 8,
   STEP_MS: 260,
   AI_DELAY: 900
 };
@@ -267,7 +266,8 @@ function wniRestoreGame() {
   }
 
   WNI.started = true;
-  WNI.gameOver = saved.gameOver === true;
+  WNI.gameOver = saved.gameOver === true &&
+    saved.players.filter((player) => !player.eliminated).length <= 1;
   WNI.isVsComputer = saved.isVsComputer === true;
   WNI.playerCount = saved.playerCount;
   WNI.currentPlayer = Number.isInteger(saved.currentPlayer) &&
@@ -444,10 +444,9 @@ function wniRenderNetworth() {
   }).join(''));
 
   if (WNI.started) {
-    const round = Math.min(WNI.turnCount + 1, WNI_CONFIG.TOTAL_ROUNDS);
-    W.$round.text(`Putaran ${round}/${WNI_CONFIG.TOTAL_ROUNDS}`);
+    W.$round.text(`Putaran ${WNI.turnCount + 1}`);
   } else {
-    W.$round.text(`Putaran 0/${WNI_CONFIG.TOTAL_ROUNDS}`);
+    W.$round.text('Putaran 0');
   }
 }
 
@@ -456,7 +455,7 @@ function wniRenderTurn() {
   if (centerStatus) {
     centerStatus.textContent = !WNI.started
       ? 'Dana bansos menanti...'
-      : `Putaran ${Math.min(WNI.turnCount + 1, WNI_CONFIG.TOTAL_ROUNDS)}/${WNI_CONFIG.TOTAL_ROUNDS} · ${WNI.players[WNI.currentPlayer].money < WNI_CONFIG.LOW_MONEY ? 'Saldo menipis!' : 'Tetap bertahan!'}`;
+      : `Putaran ${WNI.turnCount + 1} · ${WNI.players[WNI.currentPlayer].money < WNI_CONFIG.LOW_MONEY ? 'Saldo menipis!' : 'Tetap bertahan!'}`;
   }
   if (!WNI.started || WNI.gameOver) {
     W.$turnBadge.css('--c1', 'var(--muted)');
@@ -815,7 +814,7 @@ function wniNextTurn() {
   if (remainingPlayers.length <= 1) {
     return remainingPlayers.length
       ? wniGameOver(WNI.players.indexOf(remainingPlayers[0]), 'Pemain lain bangkrut.')
-      : wniEndByNetworth();
+      : wniGameOver(-1, 'Semua pemain bangkrut.');
   }
 
   const previousPlayer = WNI.currentPlayer;
@@ -824,7 +823,6 @@ function wniNextTurn() {
   } while (WNI.players[WNI.currentPlayer].eliminated);
   if (WNI.currentPlayer <= previousPlayer) {
     WNI.turnCount++;
-    if (WNI.turnCount >= WNI_CONFIG.TOTAL_ROUNDS) return wniEndByNetworth();
   }
   wniRender();
 
@@ -834,20 +832,6 @@ function wniNextTurn() {
 }
 
 /* --------------------------------------------------------------- game end */
-function wniEndByNetworth() {
-  WNI.gameOver = true;
-  WNI.busy = false;
-  const activePlayers = WNI.players.map((player, i) => ({ i, net: wniNet(i) }))
-    .filter(({ i }) => !WNI.players[i].eliminated);
-  const active = activePlayers.length
-    ? activePlayers
-    : WNI.players.map((player, i) => ({ i, net: wniNet(i) }));
-  const highest = Math.max(...active.map(({ net }) => net));
-  const winners = active.filter(({ net }) => net === highest);
-  if (winners.length > 1) return wniGameOver(-1, 'Seri! Kekayaan imbang.');
-  return wniGameOver(winners[0].i, `${WNI_CONFIG.TOTAL_ROUNDS} putaran berlalu.`);
-}
-
 function wniGameOver(winner, reason) {
   clearTimeout(wniAiTimer);
   WNI.gameOver = true;

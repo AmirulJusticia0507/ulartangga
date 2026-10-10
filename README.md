@@ -41,7 +41,7 @@ Proyek ini statis — tanpa build step, tanpa backend. Cukup buka `index.html` d
 | 🎉 **Konfeti + modal kemenangan** | Efek konfeti dan modal beri tema yang senada dengan tema halaman. |
 | 📱 **Responsif** | Papan mengikuti lebar container, selalu persegi, dan tidak pernah overflow — dari 320px sampai layar lebar. |
 | 🔀 **Switch game** | Berpindah antara Ular Tangga dan WNI Simulator tanpa memuat ulang halaman. |
-| 🇮🇩 **WNI Simulator** | Papan keliling seperti board game dengan 10 petak per sisi, ekonomi bansos, properti/sewa, dek Kesempatan dan Dana Umum satir, penyitaan, AI, bangkrut, dan penentuan pemenang setelah 8 putaran. |
+| 🇮🇩 **WNI Simulator** | Papan keliling seperti board game dengan 10 petak per sisi, ekonomi bansos, properti/sewa, dek Kesempatan dan Dana Umum satir, penyitaan, AI, dan permainan sampai tersisa satu pemain. |
 
 ---
 
@@ -98,7 +98,7 @@ php -S localhost:8080
 5. Papan WNI berbentuk **jalur keliling seperti sebelumnya**: 10 petak di tiap sisi (36 petak total karena petak sudut dipakai bersama), dengan area tengah tetap terbuka. Jalur dimulai dari START di sudut kiri bawah dan berjalan mengelilingi papan.
 6. Kartu **Kesempatan** dan **Dana Umum** membahas biaya hidup, MBG, Kopdes Merah Putih, dana haji, pajak, upah, dugaan korupsi, isu ijazah, dan proses pidana, perdata, serta tata negara. Skenarionya satir dan fiktif, bukan klaim tentang perkara nyata atau orang tertentu; dampaknya bisa menambah atau mengurangi saldo.
 7. Saldo yang tidak cukup untuk membayar kewajiban menyebabkan pemain bangkrut dan gugur. Jika tersisa satu pemain, pemain itu menang.
-8. Jika masih ada beberapa pemain, kekayaan bersih tertinggi setelah **8 putaran penuh** menjadi pemenang. Nilai kekayaan bersih adalah saldo tunai ditambah harga beli aset.
+8. Permainan tidak memiliki batas putaran. Pemain terakhir yang belum bangkrut menjadi pemenang; saldo dan kekayaan bersih tetap ditampilkan sebagai informasi.
 9. Progres WNI Simulator disimpan otomatis di browser yang sama dan dipulihkan setelah halaman dimuat ulang. Tombol reset menghapus simpanan tersebut.
 
 Bentuk jalur keliling mengambil inspirasi dari format board game roll-and-move yang dibahas
