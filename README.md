@@ -92,7 +92,7 @@ php -S localhost:8080
 ## 🇮🇩 Aturan Main — WNI Simulator
 
 1. Gunakan tombol **WNI Simulator** di header, lalu pilih **2 Pemain**, **4 Pemain**, atau **Vs AI**.
-2. Setiap pemain memulai dengan **Rp3.000.000** dan bergantian melempar dua dadu.
+2. Setiap pemain memulai dengan **Rp10.000.000** dan bergantian melempar dua dadu.
 3. Saat melewati petak Mulai, pilih **Terima** untuk menerima **Rp500.000**, atau **Batal** untuk melanjutkan tanpa bonus.
 4. Saat mendarat di properti kosong, pemain dapat membeli properti. Pemain lain yang mendarat di sana membayar sewa kepada pemilik.
 5. Papan WNI berbentuk **jalur keliling seperti sebelumnya**: 10 petak di tiap sisi (36 petak total karena petak sudut dipakai bersama), dengan area tengah tetap terbuka. Jalur dimulai dari START di sudut kiri bawah dan berjalan mengelilingi papan.
