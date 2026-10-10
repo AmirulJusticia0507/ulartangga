@@ -795,7 +795,12 @@ function wniPromptCard(decision) {
   const revealDelay = WNI.reduceMotion ? 0 : 1150;
   Swal.fire({
     position: 'center',
-    customClass: { popup: 'swal-popup wni-card-modal', confirmButton: 'swal-confirm', cancelButton: 'swal-cancel' },
+    customClass: {
+      container: 'wni-card-modal-container',
+      popup: 'swal-popup wni-card-modal',
+      confirmButton: 'swal-confirm',
+      cancelButton: 'swal-cancel'
+    },
     title: `🎴 ${deckName} sedang diacak`,
     html: `<div class="wni-card-shuffle" aria-label="Kartu sedang dikocok">
       <span class="wni-card-shuffle__card">?</span>
