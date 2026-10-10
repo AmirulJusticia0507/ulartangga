@@ -18,6 +18,11 @@ $(function () {
   function switchGame(game) {
     activeGame = game;
     const wniActive = game === 'wni';
+    try {
+      localStorage.setItem('ut-active-game', game);
+    } catch (error) {
+      console.error('Tidak dapat menyimpan mode permainan aktif.', error);
+    }
     $snakeView.prop('hidden', wniActive);
     $wniView.prop('hidden', !wniActive);
     $brandMark.text(wniActive ? '🏙️' : '🎲');
@@ -98,7 +103,14 @@ $(function () {
   buildBoard();
   showDice(0, 0);
   render();
-  switchGame('snake');
+  let initialGame = 'snake';
+  try {
+    const savedGame = localStorage.getItem('ut-active-game');
+    if (savedGame === 'wni') initialGame = savedGame;
+  } catch (error) {
+    console.error('Tidak dapat membaca mode permainan tersimpan.', error);
+  }
+  switchGame(initialGame);
   
   // Draw SVG links when ready
   requestAnimationFrame(drawLinks);

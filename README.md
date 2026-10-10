@@ -41,7 +41,7 @@ Proyek ini statis — tanpa build step, tanpa backend. Cukup buka `index.html` d
 | 🎉 **Konfeti + modal kemenangan** | Efek konfeti dan modal beri tema yang senada dengan tema halaman. |
 | 📱 **Responsif** | Papan mengikuti lebar container, selalu persegi, dan tidak pernah overflow — dari 320px sampai layar lebar. |
 | 🔀 **Switch game** | Berpindah antara Ular Tangga dan WNI Simulator tanpa memuat ulang halaman. |
-| 🇮🇩 **WNI Simulator** | Board 20 petak melingkar, ekonomi bansos, properti/sewa, dek Kesempatan dan Dana Umum satir, penyitaan, AI, bangkrut, dan penentuan pemenang setelah 8 putaran. |
+| 🇮🇩 **WNI Simulator** | Papan keliling seperti board game dengan 10 petak per sisi, ekonomi bansos, properti/sewa, dek Kesempatan dan Dana Umum satir, penyitaan, AI, bangkrut, dan penentuan pemenang setelah 8 putaran. |
 
 ---
 
@@ -93,13 +93,15 @@ php -S localhost:8080
 
 1. Gunakan tombol **WNI Simulator** di header, lalu pilih **2 Pemain**, **4 Pemain**, atau **Vs AI**.
 2. Setiap pemain memulai dengan **Rp3.000.000** dan bergantian melempar dua dadu.
-3. Lewati petak Mulai untuk menerima **Rp500.000**.
+3. Saat melewati petak Mulai, pilih **Terima** untuk menerima **Rp500.000**, atau **Batal** untuk melanjutkan tanpa bonus.
 4. Saat mendarat di properti kosong, pemain dapat membeli properti. Pemain lain yang mendarat di sana membayar sewa kepada pemilik.
-5. Kartu **Kesempatan** dan **Dana Umum** berisi kejadian satir seputar biaya hidup, layanan publik, korupsi dalam skenario rekaan, serta proses pidana, perdata, dan tata negara. Baca kartu sampai selesai: dampaknya bisa menambah atau mengurangi saldo.
-6. Saldo yang tidak cukup untuk membayar kewajiban menyebabkan pemain bangkrut dan gugur. Jika tersisa satu pemain, pemain itu menang.
-7. Jika masih ada beberapa pemain, kekayaan bersih tertinggi setelah **8 putaran penuh** menjadi pemenang. Nilai kekayaan bersih adalah saldo tunai ditambah harga beli aset.
+5. Papan WNI berbentuk **jalur keliling seperti sebelumnya**: 10 petak di tiap sisi (36 petak total karena petak sudut dipakai bersama), dengan area tengah tetap terbuka. Jalur dimulai dari START di sudut kiri bawah dan berjalan mengelilingi papan.
+6. Kartu **Kesempatan** dan **Dana Umum** membahas biaya hidup, MBG, Kopdes Merah Putih, dana haji, pajak, upah, dugaan korupsi, isu ijazah, dan proses pidana, perdata, serta tata negara. Skenarionya satir dan fiktif, bukan klaim tentang perkara nyata atau orang tertentu; dampaknya bisa menambah atau mengurangi saldo.
+7. Saldo yang tidak cukup untuk membayar kewajiban menyebabkan pemain bangkrut dan gugur. Jika tersisa satu pemain, pemain itu menang.
+8. Jika masih ada beberapa pemain, kekayaan bersih tertinggi setelah **8 putaran penuh** menjadi pemenang. Nilai kekayaan bersih adalah saldo tunai ditambah harga beli aset.
+9. Progres WNI Simulator disimpan otomatis di browser yang sama dan dipulihkan setelah halaman dimuat ulang. Tombol reset menghapus simpanan tersebut.
 
-Susunan jalur keliling mengambil inspirasi dari format board game roll-and-move yang dibahas
+Bentuk jalur keliling mengambil inspirasi dari format board game roll-and-move yang dibahas
 [artikel RRI](https://rri.co.id/padang/hobi/2786368/mencoba-sensasi-bertahan-hidup-lewat-gim-wni-simulator)
 dan [situs WNI Simulator](https://wnisimulator.hecticholic.id/#box). Nama petak, tampilan, dan
 efek kartu di implementasi ini merupakan konten orisinal untuk versi web, bukan salinan artwork
@@ -149,7 +151,7 @@ ulartangga/
 │   ├── render.js           # Seluruh fungsi render UI
 │   ├── dice.js             # Logika & animasi dadu
 │   ├── game.js             # Engine permainan
-│   ├── wni.js              # Papan 20 petak, ekonomi, kartu, AI, dan game flow WNI
+│   ├── wni.js              # Papan keliling 36 petak, ekonomi, kartu, AI, dan game flow WNI
 │   └── main.js             # Event handler & inisialisasi
 ├── ular.png                # Aset gambar kepala ular
 ├── tangga.png              # Aset gambar tangga

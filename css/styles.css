@@ -1339,7 +1339,7 @@ html[data-theme="dark"] .die {
   .game-switch { padding: 5px; }
 }
 
-/* papan WNI (loop 20 petak pada grid 6x6) */
+/* Papan WNI memakai jalur perimeter pada grid 10x10 */
 .wni-wrap {
   position: relative;
   width: min(100%, calc(var(--cell-max) * 10 + var(--gap) * 11 + 2px));
@@ -1349,8 +1349,8 @@ html[data-theme="dark"] .die {
 .wni-board {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  grid-template-rows: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  grid-template-rows: repeat(10, minmax(0, 1fr));
   aspect-ratio: 1;
   gap: var(--gap);
   padding: var(--gap);
@@ -1361,24 +1361,6 @@ html[data-theme="dark"] .die {
   border: 1px solid color-mix(in srgb, var(--border-strong) 75%, transparent);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), var(--shadow-md);
 }
-
-.wni-center {
-  grid-area: 2 / 2 / 6 / 6;
-  position: relative;
-  display: grid;
-  place-items: center;
-  gap: 6px;
-  text-align: center;
-  padding: 12px;
-  border-radius: var(--radius);
-  background:
-    radial-gradient(circle at 50% 12%, color-mix(in srgb, var(--gold-a) 18%, transparent), transparent 62%),
-    color-mix(in srgb, var(--text) 5%, transparent);
-  border: 1px dashed var(--border-strong);
-}
-.wni-center__logo { font-size: clamp(26px, 6vw, 46px); line-height: 1; }
-.wni-center__title { font-size: clamp(11px, 1.6vw, 15px); font-weight: 800; letter-spacing: -.01em; }
-.wni-center__sub { font-size: clamp(8px, 1.1vw, 10.5px); color: var(--muted); font-weight: 500; max-width: 22ch; }
 
 .wni-tile {
   position: relative;
@@ -1525,7 +1507,7 @@ html[data-theme="dark"] .die {
 
 .layout[hidden] { display: none; }
 
-/* WNI Simulator uses a warm, tabletop-style loop board */
+/* WNI Simulator uses a warm, tabletop-style perimeter board */
 .wni-wrap {
   width: min(100%, 680px);
   filter: drop-shadow(0 20px 28px rgba(0, 0, 0, .2));
@@ -1540,8 +1522,8 @@ html[data-theme="dark"] .die {
   --paper-edge: #d4b980;
   --ink: #413a30;
   --tile-gap: clamp(2px, .45vw, 5px);
-  grid-template-columns: 1.22fr repeat(4, .89fr) 1.22fr;
-  grid-template-rows: 1.22fr repeat(4, .89fr) 1.22fr;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  grid-template-rows: repeat(10, minmax(0, 1fr));
   gap: var(--tile-gap);
   padding: clamp(7px, 1vw, 11px);
   border: clamp(4px, .8vw, 8px) solid #b48b50;
@@ -1555,38 +1537,24 @@ html[data-theme="dark"] .die {
               0 18px 36px -24px rgba(0, 0, 0, .55);
 }
 .wni-center {
-  grid-area: 2 / 2 / 6 / 6;
-  overflow: hidden;
+  grid-area: 2 / 2 / 10 / 10;
+  position: relative;
+  display: grid;
+  place-items: center;
   align-content: center;
   gap: clamp(5px, 1vw, 10px);
   padding: clamp(10px, 2.3vw, 24px);
   border: 1px solid rgba(118, 86, 45, .18);
   border-radius: 14px;
-  color: var(--ink);
+  color: #433728;
   background:
     radial-gradient(circle at 50% 38%, rgba(255, 255, 255, .8), transparent 55%),
     linear-gradient(145deg, rgba(238, 215, 170, .86), rgba(226, 202, 157, .82));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8),
               inset 0 0 24px rgba(124, 89, 47, .09);
+  text-align: center;
 }
-.wni-center::before, .wni-center::after {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  width: 45%;
-  height: 18%;
-  bottom: 8%;
-  opacity: .22;
-  background: repeating-linear-gradient(90deg, #6c7459 0 7%, transparent 7% 12%);
-  clip-path: polygon(0 100%, 0 55%, 12% 55%, 12% 25%, 25% 25%, 25% 62%, 38% 62%, 38% 8%, 52% 8%, 52% 48%, 67% 48%, 67% 0, 82% 0, 82% 60%, 100% 60%, 100% 100%);
-}
-.wni-center::before { left: 3%; }
-.wni-center::after { right: 3%; transform: scaleX(-1); }
-.wni-center > * { position: relative; z-index: 1; }
-.wni-center__logo {
-  font-size: clamp(28px, 5vw, 48px);
-  filter: drop-shadow(0 4px 5px rgba(73, 53, 28, .15));
-}
+.wni-center__logo { font-size: clamp(28px, 5vw, 48px); line-height: 1; }
 .wni-center__eyebrow {
   color: #8a6940;
   font-size: clamp(6px, .85vw, 9px);
@@ -1599,7 +1567,6 @@ html[data-theme="dark"] .die {
   font-weight: 800;
   letter-spacing: .02em;
   text-transform: uppercase;
-  text-shadow: 0 1px rgba(255, 255, 255, .7);
 }
 .wni-center__sub {
   color: #725d42;
@@ -1618,6 +1585,21 @@ html[data-theme="dark"] .die {
   font-size: clamp(6px, .8vw, 9px);
   font-weight: 800;
 }
+.wni-board-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px 11px;
+  border: 1px solid rgba(118, 86, 45, .22);
+  border-radius: 8px;
+  color: #433728;
+  background: linear-gradient(145deg, #fff9e9, #e6d1a8);
+  font-size: 11px;
+  font-weight: 800;
+}
+.wni-board-status__round { text-align: right; }
 .wni-tile {
   min-width: 0;
   min-height: 0;
@@ -1745,9 +1727,6 @@ html[data-theme="dark"] .die {
   .wni-token--1 { right: 2px; }
   .wni-token--2 { left: 2px; top: 2px; }
   .wni-token--3 { right: 2px; top: 2px; }
-  .wni-center { gap: 4px; padding: 6px; }
-  .wni-center__sub { max-width: 20ch; }
-  .wni-center__stats { margin-top: 0; padding: 3px 6px; }
 }
 
 @media (max-width: 360px) {
@@ -1840,7 +1819,6 @@ html[data-game="wni"] .wni-center {
   border: 2px solid #e52620;
   border-radius: 2px;
 }
-
 html[data-game="wni"] .wni-center__logo { filter: grayscale(1); }
 html[data-game="wni"] .wni-center__eyebrow { color: #ffdb55; }
 html[data-game="wni"] .wni-center__sub { color: #e5deca; }
@@ -1853,7 +1831,27 @@ html[data-game="wni"] .wni-center__stats {
 html[data-game="wni"] .wni-tile {
   border: 1px solid #171714;
   border-radius: 2px;
-  box-shadow: 3px 3px 0 #171714;
+  box-shadow: 1px 1px 0 #171714;
+}
+
+html[data-game="wni"] .wni-tile {
+  gap: 1px;
+  padding: clamp(1px, .32vw, 4px);
+}
+
+html[data-game="wni"] .wni-tile__emoji { font-size: clamp(8px, 1.2vw, 13px); }
+html[data-game="wni"] .wni-tile__name { font-size: clamp(5px, .78vw, 8px); }
+html[data-game="wni"] .wni-tile__price { font-size: clamp(4px, .58vw, 7px); }
+html[data-game="wni"] .wni-tile__rent { display: none; }
+html[data-game="wni"] .wni-token { width: clamp(10px, 1.65vw, 18px); height: clamp(10px, 1.65vw, 18px); }
+html[data-game="wni"] .wni-tile__number {
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  color: rgba(23, 23, 20, .62);
+  font-size: clamp(4px, .5vw, 7px);
+  font-weight: 900;
+  line-height: 1;
 }
 
 html[data-game="wni"] .wni-tile--property {
