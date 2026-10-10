@@ -146,6 +146,7 @@ function wniResetState(playerCount = 2, clearSavedGame = true) {
   WNI.lastDice = [0, 0];
   WNI.players = Array.from({ length: playerCount }, () => ({
     money: WNI_CONFIG.START_MONEY,
+    moneyHistory: [WNI_CONFIG.START_MONEY],
     pos: 0,
     props: [],
     upgrades: {},
@@ -235,6 +236,19 @@ function wniCanUpgrade(playerIndex, idx) {
 function wniPick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
+function wniChangeMoney(playerIndex, delta) {
+  const player = WNI.players[playerIndex];
+  player.money += delta;
+  if (delta !== 0) {
+    player.moneyHistory.push(player.money);
+    if (player.moneyHistory.length > 16) player.moneyHistory.shift();
+  }
+}
+function wniRecordMoneyBalance(playerIndex) {
+  const player = WNI.players[playerIndex];
+  player.moneyHistory.push(player.money);
+  if (player.moneyHistory.length > 16) player.moneyHistory.shift();
+}
 function wniGridArea(i) {
   const side = WNI_CONFIG.GRID;
   if (i < side) return `${side} / ${i + 1}`;
@@ -301,6 +315,14 @@ function wniRestoreGame() {
     const props = [...new Set(player.props.filter((idx) =>
       idx < WNI_TILES.length && WNI_TILES[idx]?.type === 'property'))];
     const upgrades = {};
+    const moneyHistory = Array.isArray(player.moneyHistory)
+      ? player.moneyHistory.filter(Number.isFinite).slice(-16).reduce((history, balance) => {
+        if (history[history.length - 1] !== balance) history.push(balance);
+        return history;
+      }, [])
+      : [];
+    if (moneyHistory[moneyHistory.length - 1] !== player.money) moneyHistory.push(player.money);
+    if (moneyHistory.length > 16) moneyHistory.shift();
     props.forEach((idx) => {
       const level = player.upgrades?.[idx];
       if (Number.isInteger(level) && level >= 0 && level <= WNI_CONFIG.MAX_PROPERTY_LEVEL) {
@@ -309,6 +331,7 @@ function wniRestoreGame() {
     });
     return {
       money: player.money,
+      moneyHistory: moneyHistory.length ? moneyHistory : [player.money],
       pos: player.pos % WNI_CONFIG.TILE_COUNT,
       props,
       upgrades,
@@ -499,14 +522,29 @@ function wniRenderPlayers() {
 
 function wniRenderNetworth() {
   const values = WNI.players.map((_, i) => wniNet(i));
-  const max = Math.max(...values, 1);
   W.$networth.html(values.map((value, i) => {
     const vars = wniVar(i).split(', ');
-    const pct = Math.max(3, Math.round((value / max) * 100));
+    const history = WNI.players[i].moneyHistory;
+    const points = (history.length ? history : [WNI.players[i].money]).slice(-12);
+    const chartPoints = points.length === 1 ? [points[0], points[0]] : points;
+    const low = Math.min(...points);
+    const high = Math.max(...points);
+    const range = high - low || 1;
+    const coordinates = chartPoints.map((balance, index) => {
+      const x = (index / (chartPoints.length - 1)) * 120;
+      const y = 30 - ((balance - low) / range) * 24;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    const trend = points.length > 1
+      ? points[points.length - 1] > points[points.length - 2] ? 'naik'
+        : points[points.length - 1] < points[points.length - 2] ? 'turun' : 'tetap'
+      : 'tetap';
     return `<div class="wni-net-item" style="--c1:${vars[0]};--c2:${vars[1]}">
       <span class="wni-net-item__dot" aria-hidden="true"></span>
-      <span class="wni-net-item__bar"><span class="wni-net-item__fill" style="width:${pct}%"></span></span>
-      <span class="wni-net-item__val">${WNI.players[i].eliminated ? 'Gugur · ' : ''}${wniMoney(value)}</span>
+      <svg class="wni-net-item__chart is-${trend}" viewBox="0 0 120 34" preserveAspectRatio="none" role="img" aria-label="Tren saldo ${wniName(i)} ${trend}">
+        <polyline class="wni-net-item__line" points="${coordinates}"></polyline>
+      </svg>
+      <span class="wni-net-item__val">${WNI.players[i].eliminated ? 'Gugur · ' : ''}${wniMoney(WNI.players[i].money)}<small>Net ${wniMoney(value)}</small></span>
     </div>`;
   }).join(''));
 
@@ -673,8 +711,8 @@ function wniResolveTile(player) {
     }
     const rent = wniRent(idx, wniUpgradeLevel(WNI.players[owner], idx));
     const paid = Math.min(p.money, rent);
-    p.money -= rent;
-    WNI.players[owner].money += paid;
+    wniChangeMoney(player, -rent);
+    wniChangeMoney(owner, paid);
     toast(`💰 ${wniName(player)} bayar sewa ${wniMoney(paid)}`);
     wniLog('💰', `${wniName(player)} bayar sewa ke ${wniName(owner)}`, '-' + wniMoney(paid), 'rent');
     return wniAfterAction(player);
@@ -689,7 +727,7 @@ function wniResolveTile(player) {
   }
 
   if (tile.type === 'pajak') {
-    p.money -= WNI_CONFIG.PAJAK;
+    wniChangeMoney(player, -WNI_CONFIG.PAJAK);
     toast(`🧾 ${wniName(player)} kena pajak ${wniMoney(WNI_CONFIG.PAJAK)}`);
     wniLog('🧾', `${wniName(player)} bayar pajak & retribusi`, '-' + wniMoney(WNI_CONFIG.PAJAK), 'pajak');
     return wniAfterAction(player);
@@ -705,7 +743,7 @@ function wniResolveTile(player) {
       toast(`🚫 Negara menyita ${WNI_TILES[cheapest].name}!`);
       wniLog('🚫', `Negara sita <strong>${WNI_TILES[cheapest].name}</strong> milik ${wniName(player)}`, '', 'sita');
     } else {
-      p.money -= WNI_CONFIG.DENDA_SITA;
+      wniChangeMoney(player, -WNI_CONFIG.DENDA_SITA);
       toast(`🚫 Tak ada aset, ${wniName(player)} didenda ${wniMoney(WNI_CONFIG.DENDA_SITA)}`);
       wniLog('🚫', `${wniName(player)} didenda penyitaan`, '-' + wniMoney(WNI_CONFIG.DENDA_SITA), 'sita');
     }
@@ -743,34 +781,53 @@ function wniPromptCard(decision) {
   const amount = Math.abs(card.delta);
   const change = card.delta < 0 ? `−${wniMoney(amount)}` : `+${wniMoney(amount)}`;
   const playerNameText = wniName(player);
+  const autoApply = WNI.isVsComputer && player === 1;
 
-  if (WNI.isVsComputer && player === 1) {
-    WNI.players[player].money += card.delta;
-    wniLog(card.icon, `<strong>${playerNameText}</strong> menerima ${deckName}: ${card.title}`, change, logType);
-    WNI.pendingDecision = null;
-    wniRender();
-    toast(`${card.icon} ${playerNameText}: ${card.title} (${change})`);
-    return wniAfterAction(player);
-  }
-
+  const cardHtml = `<div class="wni-card-draw wni-card-draw--revealed">
+    <div class="wni-card-draw__face" aria-hidden="true">${card.icon}</div>
+    <strong class="wni-card-draw__title">${card.title}</strong>
+    <p>${card.text}</p>
+    <span class="wni-card-draw__amount${card.delta < 0 ? ' is-loss' : ''}">${change} jika diterima</span>
+    <small>Terima untuk menjalankan efek kartu. Batal untuk melewati kartu tanpa perubahan saldo.</small>
+    ${autoApply ? '<small>Efek kartu diterapkan otomatis untuk AI.</small>' : ''}
+    <small>Skenario fiktif untuk permainan; tidak merujuk pada orang atau perkara tertentu.</small>
+  </div>`;
+  const revealDelay = WNI.reduceMotion ? 0 : 1150;
   Swal.fire({
-    customClass: { popup: 'swal-popup', confirmButton: 'swal-confirm', cancelButton: 'swal-cancel' },
-    title: `${card.icon} ${deckName}`,
-    html: `<div class="wni-card-draw">
-      <strong class="wni-card-draw__title">${card.title}</strong>
-      <p>${card.text}</p>
-      <span class="wni-card-draw__amount${card.delta < 0 ? ' is-loss' : ''}">${change} jika diterima</span>
-      <small>Terima untuk menjalankan efek kartu. Batal untuk melewati kartu tanpa perubahan saldo.</small>
-      <small>Skenario fiktif untuk permainan; tidak merujuk pada orang atau perkara tertentu.</small>
-    </div>`,
-    showCancelButton: true,
-    confirmButtonText: 'Terima',
-    cancelButtonText: 'Batal',
+    position: 'center',
+    customClass: { popup: 'swal-popup wni-card-modal', confirmButton: 'swal-confirm', cancelButton: 'swal-cancel' },
+    title: `🎴 ${deckName} sedang diacak`,
+    html: `<div class="wni-card-shuffle" aria-label="Kartu sedang dikocok">
+      <span class="wni-card-shuffle__card">?</span>
+      <span class="wni-card-shuffle__card">?</span>
+      <span class="wni-card-shuffle__card">?</span>
+    </div><p class="wni-card-shuffle__label">Mengocok kartu...</p>`,
+    showConfirmButton: false,
+    showCancelButton: false,
     allowOutsideClick: false,
-    allowEscapeKey: false
+    allowEscapeKey: false,
+    didOpen: () => {
+      const popup = Swal.getPopup();
+      setTimeout(() => {
+        if (!popup || Swal.getPopup() !== popup) return;
+        Swal.update({
+          title: `${card.icon} ${deckName}`,
+          html: cardHtml,
+          showConfirmButton: !autoApply,
+          showCancelButton: !autoApply,
+          confirmButtonText: 'Terima',
+          cancelButtonText: 'Batal'
+        });
+        if (autoApply) {
+          setTimeout(() => {
+            if (Swal.getPopup() === popup) Swal.close();
+          }, WNI.reduceMotion ? 1100 : 1500);
+        }
+      }, revealDelay);
+    }
   }).then((result) => {
-    if (result.isConfirmed) {
-      WNI.players[player].money += card.delta;
+    if (autoApply || result.isConfirmed) {
+      wniChangeMoney(player, card.delta);
       wniLog(card.icon, `<strong>${playerNameText}</strong> menerima ${deckName}: ${card.title}`, change, logType);
       toast(`${card.icon} ${playerNameText}: ${card.title} (${change})`);
     } else {
@@ -786,7 +843,7 @@ function wniPromptCard(decision) {
 function wniPromptStart(player, remaining) {
   const playerNameText = wniName(player);
   if (WNI.isVsComputer && player === 1) {
-    WNI.players[player].money += WNI_CONFIG.PASS_GO;
+    wniChangeMoney(player, WNI_CONFIG.PASS_GO);
     WNI.pendingDecision = null;
     wniLog('💵', `<strong>${playerNameText}</strong> menerima bonus saat melewati START`, '+' + wniMoney(WNI_CONFIG.PASS_GO), 'start');
     toast(`💵 ${playerNameText} menerima bonus START ${wniMoney(WNI_CONFIG.PASS_GO)}`);
@@ -809,7 +866,7 @@ function wniPromptStart(player, remaining) {
     allowEscapeKey: false
   }).then((result) => {
     if (result.isConfirmed) {
-      WNI.players[player].money += WNI_CONFIG.PASS_GO;
+      wniChangeMoney(player, WNI_CONFIG.PASS_GO);
       wniLog('💵', `<strong>${playerNameText}</strong> menerima bantuan saat melewati START`, '+' + wniMoney(WNI_CONFIG.PASS_GO), 'start');
       toast(`💵 ${playerNameText} menerima bantuan START ${wniMoney(WNI_CONFIG.PASS_GO)}`);
     } else {
@@ -861,7 +918,7 @@ function wniBuy(player, idx) {
   const tile = WNI_TILES[idx];
   delete WNI.players[player].upgrades[idx];
   WNI.owners[idx] = player;
-  WNI.players[player].money -= tile.price;
+  wniChangeMoney(player, -tile.price);
   WNI.players[player].props.push(idx);
   toast(`🏠 ${wniName(player)} beli ${tile.name} ${wniMoney(tile.price)}`);
   wniLog('🏠', `<strong>${wniName(player)}</strong> beli ${tile.name}`, '-' + wniMoney(tile.price), 'buy');
@@ -905,7 +962,7 @@ function wniPromptUpgrade(decision) {
         toast('Saldo atau status aset berubah; upgrade tidak dilakukan.');
         return;
       }
-      WNI.players[player].money -= cost;
+      wniChangeMoney(player, -cost);
       WNI.players[player].upgrades[idx] = nextLevel;
       wniLog('🏗️', `<strong>${wniName(player)}</strong> upgrade ${tile.name} ke tingkat ${nextLevel}`, `-${wniMoney(cost)} · sewa ${wniMoney(nextRent)}`, 'upgrade');
       toast(`🏗️ ${tile.name} menjadi tingkat ${nextLevel}; sewa ${wniMoney(nextRent)}`);
@@ -920,6 +977,7 @@ function wniAfterAction(player) {
   WNI.pendingDecision = null;
   if (WNI.players[player].money < 0) {
     WNI.players[player].money = 0;
+    wniRecordMoneyBalance(player);
     WNI.players[player].eliminated = true;
     wniLog('💸', `<strong>${wniName(player)}</strong> bangkrut dan gugur`, '', 'skip');
   }

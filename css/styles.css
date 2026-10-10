@@ -1494,6 +1494,7 @@ html[data-theme="dark"] .die {
   font-variant-numeric: tabular-nums;
 }
 .wni-networth { display: grid; gap: 8px; }
+.wni-status-hint { margin: 0 0 9px; color: var(--muted); font-size: 11px; }
 .wni-net-item {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -1502,19 +1503,26 @@ html[data-theme="dark"] .die {
   font-size: 12.5px;
   font-weight: 600;
 }
-.wni-net-item__bar {
-  height: 8px;
-  border-radius: var(--pill);
-  background: color-mix(in srgb, var(--text) 10%, transparent);
-  overflow: hidden;
+.wni-net-item__chart { width: 100%; height: 34px; overflow: visible; }
+.wni-net-item__line {
+  fill: none;
+  stroke: var(--trend-color, var(--c1, var(--p1-a)));
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--trend-color, var(--c1)) 55%, transparent));
+  animation: wni-chart-draw .65s ease-out forwards;
+  transition: stroke .3s ease;
 }
-.wni-net-item__fill {
-  height: 100%;
-  border-radius: var(--pill);
-  background: linear-gradient(90deg, var(--c1, var(--p1-a)), var(--c2, var(--p1-b)));
-  transition: width .55s var(--ease-out);
-}
-.wni-net-item__val { font-variant-numeric: tabular-nums; color: var(--c1, var(--text)); font-weight: 800; }
+@keyframes wni-chart-draw { to { stroke-dashoffset: 0; } }
+.wni-net-item__chart.is-naik { --trend-color: #31a956; }
+.wni-net-item__chart.is-turun { --trend-color: #e52620; }
+.wni-net-item__chart.is-tetap { --trend-color: var(--c1, var(--p1-a)); }
+.wni-net-item__val { font-variant-numeric: tabular-nums; color: var(--c1, var(--text)); font-weight: 800; text-align: right; white-space: nowrap; }
+.wni-net-item__val small { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; font-weight: 600; }
 .wni-net-item__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c1, var(--p1-a)); }
 
 .wni-card .board-hint { border-radius: var(--radius-lg); }
@@ -1990,6 +1998,67 @@ html[data-game="wni"] .wni-layout .btn:not(.btn--ghost) {
 html[data-game="wni"] .wni-layout .btn--ghost {
   color: var(--text);
   border-radius: 3px;
+}
+
+html[data-game="wni"] .wni-card-modal {
+  width: min(92vw, 520px) !important;
+}
+
+html[data-game="wni"] .wni-card-shuffle {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150px;
+  perspective: 700px;
+}
+
+html[data-game="wni"] .wni-card-shuffle__card {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 124px;
+  border: 3px solid #171714;
+  border-radius: 9px;
+  color: #ffdb55;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 7px, rgba(255, 219, 85, .18) 7px 10px),
+    #e52620;
+  box-shadow: 4px 4px 0 #171714;
+  font-size: 2rem;
+  font-weight: 900;
+  animation: wni-card-shuffle 850ms ease-in-out infinite;
+}
+html[data-game="wni"] .wni-card-shuffle__card:nth-child(2) { animation-delay: -280ms; }
+html[data-game="wni"] .wni-card-shuffle__card:nth-child(3) { animation-delay: -560ms; }
+html[data-game="wni"] .wni-card-shuffle__label {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+  text-align: center;
+}
+@keyframes wni-card-shuffle {
+  0%, 100% { transform: translateX(-42px) rotate(-12deg) rotateY(0); }
+  50% { transform: translateX(42px) rotate(12deg) rotateY(180deg); }
+}
+html[data-game="wni"] .wni-card-draw--revealed {
+  animation: wni-card-reveal 650ms cubic-bezier(.2, .8, .2, 1) both;
+  transform-origin: center;
+}
+html[data-game="wni"] .wni-card-draw__face {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 2px solid #171714;
+  border-radius: 50%;
+  background: #ffdb55;
+  font-size: 2rem;
+}
+@keyframes wni-card-reveal {
+  from { opacity: 0; transform: perspective(700px) rotateY(90deg) scale(.82); }
+  to { opacity: 1; transform: perspective(700px) rotateY(0) scale(1); }
 }
 
 html[data-game="wni"] .wni-card-draw {
