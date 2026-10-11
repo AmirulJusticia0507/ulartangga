@@ -96,7 +96,13 @@ const WNI_CHANCE_CARDS = [
   { icon: '🧑‍⚖️', title: 'Proses pidana transparan', text: 'Dalam skenario fiktif, pemeriksaan perkara diawasi dan hak semua pihak dihormati. Kamu menerima honor sebagai saksi ahli.', delta: 300000 },
   { icon: '🏠', title: 'Sengketa perdata selesai', text: 'Mediasi berbasis bukti menyelesaikan sengketa kontrakan tanpa sidang panjang. Biaya dan waktu kerjamu terselamatkan.', delta: 250000 },
   { icon: '🗣️', title: 'Warga menagih janji', text: 'Pejabat yang mengabaikan aturan diminta memberi penjelasan lewat rapat terbuka dan pengawasan publik. Ongkos advokasi dibagi bersama.', delta: 200000 },
-  { icon: '👑', title: 'Aturan dianggap pilihan', text: 'Dalam skenario satir, pemimpin mengubah aturan saat merasa terganggu olehnya. Warga menempuh pengawasan dan uji tata negara; biaya advokasi patungan tetap menguras dana.', delta: -150000 }
+  { icon: '👑', title: 'Aturan dianggap pilihan', text: 'Dalam skenario satir, pemimpin mengubah aturan saat merasa terganggu olehnya. Warga menempuh pengawasan dan uji tata negara; biaya advokasi patungan tetap menguras dana.', delta: -150000 },
+  { icon: '📦', title: 'Paket bantuan salah sasaran', text: 'Dalam skenario fiktif, data penerima bantuan tidak diperbarui. Kamu membantu tetangga mengajukan koreksi dan menerima penggantian ongkos.', delta: 150000 },
+  { icon: '🧑‍🍳', title: 'Upah dapur belum cair', text: 'Pembayaran kerja di dapur program makan terlambat. Kamu tetap harus membayar ongkos pulang dan kebutuhan harian.', delta: -220000 },
+  { icon: '🔍', title: 'Laporan warga ditindaklanjuti', text: 'Catatan warga tentang mutu proyek dan penggunaan anggaran diperiksa secara terbuka dalam skenario permainan. Kerja pendataanmu mendapat honor.', delta: 250000 },
+  { icon: '🗂️', title: 'Dokumen publik disembunyikan', text: 'Permintaan informasi anggaran dipingpong antar meja. Kamu membayar biaya salinan dan kehilangan satu hari kerja.', delta: -180000 },
+  { icon: '🧑‍⚖️', title: 'Bantuan hukum kolektif', text: 'Warga mengumpulkan bukti dan berkonsultasi bersama. Beban biaya perkara perdata terbagi lebih ringan.', delta: 300000 },
+  { icon: '🏛️', title: 'Kebijakan diuji di ruang publik', text: 'Dalam skenario fiktif, keputusan yang berdampak pada warga dibahas terbuka dan diperbaiki setelah masukan masyarakat.', delta: 200000 }
 ];
 
 const WNI_PUBLIC_FUND_CARDS = [
@@ -122,7 +128,13 @@ const WNI_PUBLIC_FUND_CARDS = [
   { icon: '📜', title: 'Isu ijazah jadi perkara panjang', text: 'Perdebatan soal keaslian ijazah tokoh publik memenuhi ruang publik. Dalam kartu fiktif ini tidak ada kesimpulan tentang siapa pun; proses verifikasi dan konsultasi hukum tetap menguras biaya.', delta: -200000 },
   { icon: '🧾', title: 'Pungutan tanpa dasar diuji', text: 'Kamu menolak pungutan yang tidak disertai dasar aturan. Pengaduan resmi berhasil, tetapi ongkos transport dan waktu kerja tidak kembali.', delta: -120000 },
   { icon: '🏗️', title: 'Proyek publik jadi bancakan', text: 'Skenario fiktif menggambarkan pengadaan yang diawasi buruk dan pekerjaan tak sesuai spesifikasi. Jalan rusak membuat usaha kecilmu sepi.', delta: -320000 },
-  { icon: '🗳️', title: 'Hak warga mengawasi anggaran', text: 'Keterbukaan informasi membuat belanja publik bisa diperiksa. Dalam skenario permainan, dana yang salah salur dikembalikan ke layanan warga.', delta: 300000 }
+  { icon: '🗳️', title: 'Hak warga mengawasi anggaran', text: 'Keterbukaan informasi membuat belanja publik bisa diperiksa. Dalam skenario permainan, dana yang salah salur dikembalikan ke layanan warga.', delta: 300000 },
+  { icon: '🍱', title: 'Distribusi makan terlambat', text: 'Dalam skenario fiktif, jadwal pengiriman program makan berantakan. Kamu membeli makan pengganti dan ongkos perjalanan bertambah.', delta: -200000 },
+  { icon: '🏘️', title: 'Modal Kopdes tertahan', text: 'Laporan usaha koperasi desa belum dibagikan kepada anggota. Simpananmu belum bisa ditarik saat biaya sekolah jatuh tempo.', delta: -250000 },
+  { icon: '🕋', title: 'Rincian biaya perjalanan terbuka', text: 'Audit dan informasi biaya perjalanan ibadah dipublikasikan dalam skenario permainan. Selisih pembayaran yang terverifikasi dikembalikan.', delta: 250000 },
+  { icon: '🚔', title: 'Penyidikan perlu waktu', text: 'Dugaan penyimpangan anggaran sedang diperiksa dan belum membuktikan kesalahan pihak mana pun. Warga menutup dulu biaya layanan yang tertunda.', delta: -180000 },
+  { icon: '📈', title: 'Harga naik, upah tertinggal', text: 'Harga pangan dan kontrakan kembali naik, sementara upah tetap. Anggaran bulananmu harus dipangkas.', delta: -350000 },
+  { icon: '📜', title: 'Aturan diuji lewat prosedur', text: 'Warga mengajukan keberatan melalui jalur hukum yang berlaku. Keputusan sementara ditinjau dan kerugianmu sebagian dipulihkan.', delta: 300000 }
 ];
 
 /* ------------------------------------------------------------------ state */
@@ -133,9 +145,12 @@ const WNI = {
 };
 
 let wniAiTimer = 0;
+let wniMovementTimer = 0;
 
 function wniResetState(playerCount = 2, clearSavedGame = true) {
   clearTimeout(wniAiTimer);
+  clearTimeout(wniMovementTimer);
+  wniMovementTimer = 0;
   WNI.started = false;
   WNI.setupReady = false;
   WNI.isVsComputer = false;
@@ -257,10 +272,23 @@ function wniRecordMoneyBalance(playerIndex) {
 }
 function wniGridArea(i) {
   const side = WNI_CONFIG.GRID;
-  if (i < side) return `${side} / ${i + 1}`;
-  if (i < side * 2 - 2) return `${side * 2 - i - 1} / ${side}`;
-  if (i < side * 3 - 2) return `1 / ${side * 3 - i - 2}`;
-  return `${i - side * 3 + 4} / 1`;
+  const last = side - 1;
+  let row;
+  let column;
+  if (i < side) {
+    row = side;
+    column = i + 1;
+  } else if (i < side + last - 1) {
+    row = side - (i - side) - 1;
+    column = side;
+  } else if (i < side + last * 2) {
+    row = 1;
+    column = side - (i - (side + last - 1));
+  } else {
+    row = i - (side + last * 2 - 2);
+    column = 1;
+  }
+  return `${row} / ${column}`;
 }
 
 function wniPersist() {
@@ -432,11 +460,13 @@ function wniBuildBoard() {
   let propertyIndex = 0;
   WNI_TILES.forEach((t, i) => {
     const band = t.price ? propertyBands[Math.floor(propertyIndex++ / 3) % propertyBands.length] : '#c4ad7e';
-    const sides = [];
-    if (i < WNI_CONFIG.GRID) sides.push('bottom');
-    if (i >= WNI_CONFIG.GRID - 1 && i < WNI_CONFIG.GRID * 2 - 1) sides.push('right');
-    if (i >= WNI_CONFIG.GRID * 2 - 2 && i < WNI_CONFIG.GRID * 3 - 2) sides.push('top');
-    if (i >= WNI_CONFIG.GRID * 3 - 3 || i === 0) sides.push('left');
+    const [row, column] = wniGridArea(i).split(' / ').map(Number);
+    const sides = [
+      ...(row === WNI_CONFIG.GRID ? ['bottom'] : []),
+      ...(column === WNI_CONFIG.GRID ? ['right'] : []),
+      ...(row === 1 ? ['top'] : []),
+      ...(column === 1 ? ['left'] : [])
+    ];
     html += `<div class="wni-tile wni-tile--${t.type} ${sides.map((side) => `wni-tile--${side}`).join(' ')}"
       id="wniTile${i}" role="group" aria-label="Petak ${i + 1}: ${t.name}" style="grid-area:${wniGridArea(i)};--tile-color:${band}">
       <span class="wni-tile__stripe" aria-hidden="true"></span>
@@ -457,7 +487,7 @@ function wniBuildBoard() {
   W.$board.html(html);
 }
 
-function wniRenderTokens() {
+function wniRenderTokens(movingPlayer = -1) {
   W.$board.find('.wni-token').each(function () {
     const player = +this.id.replace('wniToken', '');
     const $t = $(this);
@@ -470,6 +500,11 @@ function wniRenderTokens() {
     }
     $t.text(wniIcon(player));
     $t.css('background', `linear-gradient(140deg, ${wniVar(player)})`);
+    $t.removeClass('is-stepping');
+    if (player === movingPlayer && !WNI.reduceMotion) {
+      void $t[0].offsetWidth;
+      $t.addClass('is-stepping');
+    }
     $t.toggleClass('is-turn', WNI.started && !WNI.gameOver && player === WNI.currentPlayer);
   });
   W.$board.find('.wni-tile')
@@ -683,6 +718,8 @@ function wniPlayTurn() {
 }
 
 function wniMove(player, steps) {
+  clearTimeout(wniMovementTimer);
+  wniMovementTimer = 0;
   const delay = WNI.reduceMotion ? 20 : WNI_CONFIG.STEP_MS;
   let remaining = steps;
   WNI.pendingMovement = { player, remaining };
@@ -693,20 +730,29 @@ function wniMove(player, steps) {
       const p = WNI.players[player];
       p.pos = (p.pos + 1) % WNI_CONFIG.TILE_COUNT;
       remaining--;
+      const $tile = $('#wniTile' + p.pos);
+      W.$board.find('.wni-tile--step').removeClass('wni-tile--step');
+      if (!WNI.reduceMotion) {
+        $tile.addClass('wni-tile--step');
+        setTimeout(() => $tile.removeClass('wni-tile--step'), 380);
+      }
       if (p.pos === 0) {
         WNI.pendingDecision = { type: 'start', player, remaining };
         WNI.pendingMovement = { player, remaining };
         WNI.busy = true;
-        wniRenderTokens();
+        wniRenderTokens(player);
         wniRenderPlayers();
         wniPersist();
         return wniPromptStart(player, remaining);
       }
       WNI.pendingMovement = { player, remaining };
-      wniRenderTokens();
+      wniRenderTokens(player);
       wniRenderPlayers();
       wniPersist();
-      setTimeout(step, delay);
+      wniMovementTimer = setTimeout(() => {
+        wniMovementTimer = 0;
+        step();
+      }, delay);
     } else {
       WNI.pendingMovement = null;
       wniPersist();
@@ -1005,6 +1051,11 @@ function wniPromptUpgrade(decision) {
       WNI.players[player].upgrades[idx] = nextLevel;
       wniLog('🏗️', `<strong>${wniName(player)}</strong> upgrade ${tile.name} ke tingkat ${nextLevel}`, `-${wniMoney(cost)} · sewa ${wniMoney(nextRent)}`, 'upgrade');
       toast(`🏗️ ${tile.name} menjadi tingkat ${nextLevel}; sewa ${wniMoney(nextRent)}`);
+      if (!WNI.reduceMotion) {
+        const $tile = $('#wniTile' + idx);
+        $tile.addClass('is-upgrade-flash');
+        setTimeout(() => $tile.removeClass('is-upgrade-flash'), 900);
+      }
     }
     wniRender();
   });

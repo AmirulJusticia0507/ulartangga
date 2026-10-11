@@ -97,11 +97,12 @@ php -S localhost:8080
 4. Saat melewati petak Mulai, pilih **Terima** untuk menerima **Rp500.000**, atau **Batal** untuk melanjutkan tanpa bonus.
 5. Saat mendarat di properti kosong, pemain dapat membeli properti. Pemain lain yang mendarat di sana membayar sewa kepada pemilik.
 6. Pemain dapat meng-upgrade properti miliknya kapan saja dari daftar aset: maksimal **3 tingkat**, tiap tingkat berbiaya **50% dari harga beli awal**, dan sewa menjadi **2× lipat per tingkat**. Upgrade menambah nilai aset bersih; bangunan ditandai di papan.
-7. Papan WNI berbentuk **jalur keliling seperti sebelumnya**: 10 petak di tiap sisi (36 petak total karena petak sudut dipakai bersama), dengan area tengah tetap terbuka. Jalur dimulai dari START di sudut kiri bawah dan berjalan mengelilingi papan.
-8. Kartu **Kesempatan** dan **Dana Umum** dipilih acak, dikocok dan dibuka dengan animasi di modal tengah layar. Kartu membahas biaya hidup, MBG, Kopdes Merah Putih, dana haji, pajak, upah, dugaan korupsi, isu ijazah, dan proses pidana, perdata, serta tata negara. Skenarionya satir dan fiktif, bukan klaim tentang perkara nyata atau orang tertentu; dampaknya bisa menambah atau mengurangi saldo.
+7. Papan WNI adalah perimeter persegi **10×10**: setiap sisi menampilkan 10 petak, termasuk empat sudut bersama (36 petak unik), sementara area tengah tetap terbuka. Jalur dimulai dari START di sudut kiri bawah, berjalan searah jarum jam, lalu kembali ke START.
+8. Kartu **Kesempatan** dan **Dana Umum** dipilih acak, dikocok dan dibuka dengan animasi di modal tengah layar. Dek diperluas dengan skenario MBG, Kopdes Merah Putih, dana haji, pajak, upah, pengawasan anggaran, dugaan korupsi, isu ijazah, dan proses pidana, perdata, serta tata negara. Skenarionya satir dan fiktif, bukan klaim tentang perkara nyata atau orang tertentu; dampaknya bisa menambah atau mengurangi saldo.
 9. Saldo yang tidak cukup untuk membayar kewajiban menyebabkan pemain bangkrut dan gugur. Jika tersisa satu pemain, pemain itu menang.
 10. Permainan tidak memiliki batas putaran. Pemain terakhir yang belum bangkrut menjadi pemenang; saldo dan kekayaan bersih tetap ditampilkan sebagai informasi.
 11. Progres WNI Simulator disimpan otomatis di browser yang sama dan dipulihkan setelah halaman dimuat ulang. Termasuk pilihan ikon pemain, status upgrade, modal yang sedang berjalan, dan riwayat perubahan saldo untuk grafik tren Status. Tombol reset menghapus simpanan tersebut.
+12. Saat token bergerak, petak yang dilewati menyala dan token melompat; setelah upgrade, petak aset mendapat animasi sorotan. Animasi menghormati pengaturan pengurangan gerak perangkat.
 
 Bentuk jalur keliling mengambil inspirasi dari format board game roll-and-move yang dibahas
 [artikel RRI](https://rri.co.id/padang/hobi/2786368/mencoba-sensasi-bertahan-hidup-lewat-gim-wni-simulator)
