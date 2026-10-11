@@ -19,6 +19,7 @@ const WNI_CONFIG = {
 };
 
 const WNI_STORAGE_KEY = 'wni-simulator-save-v1';
+const WNI_PLAYER_ICONS = ['🧑', '👩', '🧑‍🚀', '🚴', '👨‍💼', '👩‍💼', '🧑‍🌾', '🧑‍⚖️', '🧑‍🍳', '🧑‍🔧', '🧑‍🏫', '🐈'];
 
 const WNI_TILES = [
   { type: 'start',     name: 'Start · Kelurahan',  emoji: '🏁' },
@@ -126,7 +127,9 @@ const WNI_PUBLIC_FUND_CARDS = [
 
 /* ------------------------------------------------------------------ state */
 const WNI = {
-  reduceMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  reduceMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  selectedIcons: ['🧑', '👩', '🧑‍🚀', '🚴'],
+  setupReady: false
 };
 
 let wniAiTimer = 0;
@@ -134,6 +137,7 @@ let wniAiTimer = 0;
 function wniResetState(playerCount = 2, clearSavedGame = true) {
   clearTimeout(wniAiTimer);
   WNI.started = false;
+  WNI.setupReady = false;
   WNI.isVsComputer = false;
   WNI.busy = false;
   WNI.gameOver = false;
@@ -181,7 +185,9 @@ const W = {
   $turnName: $('#wniTurnName'),
   $hint: $('#wniHint'),
   $round: $('#wniRound'),
-  $networth: $('#wniNetworth')
+  $networth: $('#wniNetworth'),
+  $start: $('#wniStart'),
+  $setupHint: $('#wniSetupHint')
 };
 
 /* --------------------------------------------------------------- helpers */
@@ -198,7 +204,7 @@ function wniName(i) {
 }
 function wniIcon(i) {
   if (WNI.isVsComputer && i === 1) return '🤖';
-  return ['🧑', '👩', '🧑‍🚀', '🚴'][i];
+  return WNI.selectedIcons[i] || WNI_PLAYER_ICONS[i];
 }
 function wniVar(i) {
   if (WNI.isVsComputer && i === 1) return 'var(--ai-a), var(--ai-b)';
@@ -269,6 +275,7 @@ function wniPersist() {
       currentPlayer: WNI.currentPlayer,
       turnCount: WNI.turnCount,
       players: WNI.players,
+      selectedIcons: WNI.selectedIcons,
       owners: WNI.owners,
       log: WNI.log,
       pendingDecision: WNI.pendingDecision,
@@ -308,6 +315,10 @@ function wniRestoreGame() {
     saved.players.filter((player) => !player.eliminated).length <= 1;
   WNI.isVsComputer = saved.isVsComputer === true;
   WNI.playerCount = saved.playerCount;
+  WNI.selectedIcons = Array.from({ length: 4 }, (_, index) =>
+    WNI_PLAYER_ICONS.includes(saved.selectedIcons?.[index])
+      ? saved.selectedIcons[index]
+      : ['🧑', '👩', '🧑‍🚀', '🚴'][index]);
   WNI.currentPlayer = Number.isInteger(saved.currentPlayer) &&
     saved.currentPlayer >= 0 && saved.currentPlayer < saved.playerCount ? saved.currentPlayer : 0;
   WNI.turnCount = Number.isInteger(saved.turnCount) && saved.turnCount >= 0 ? saved.turnCount : 0;
@@ -508,11 +519,30 @@ function wniRenderPlayers() {
         ${upgradeAction}
       </span>`;
     }).join('');
+    const isHuman = !(WNI.isVsComputer && i === 1);
+    const usedByOthers = WNI.selectedIcons.filter((_, index) =>
+      index !== i && index < WNI.players.length &&
+      !(WNI.isVsComputer && index === 1));
+    const iconPicker = WNI.setupReady && !WNI.started && isHuman
+      ? `<div class="wni-icon-picker" role="group" aria-label="Pilih ikon ${wniName(i)}">
+          <span class="wni-icon-picker__label">Pilih ikon:</span>
+          <div class="wni-icon-picker__options">
+            ${WNI_PLAYER_ICONS.map((icon) => {
+              const selected = WNI.selectedIcons[i] === icon;
+              const unavailable = usedByOthers.includes(icon);
+              return `<button class="wni-icon-picker__option${selected ? ' is-selected' : ''}" type="button"
+                data-wni-icon="${icon}" data-player="${i}" ${unavailable ? 'disabled' : ''}
+                aria-label="${icon}" aria-pressed="${selected}">${icon}</button>`;
+            }).join('')}
+          </div>
+        </div>`
+      : '';
     return `<div class="player-row wni-player${active ? ' is-turn' : ''}" data-p="${i + 1}" style="--c1:${vars[0]};--c2:${vars[1]}">
       <div class="player-row__avatar" aria-hidden="true">${wniIcon(i)}</div>
       <div>
         <div class="player-row__name">${wniName(i)}</div>
         <div class="player-row__meta">${WNI.isVsComputer && i === 1 ? 'Komputer' : `Pemain ${i + 1}`} · ${WNI_TILES[p.pos].emoji} ${WNI_TILES[p.pos].name}${p.eliminated ? ' · Gugur' : ''}</div>
+        ${iconPicker}
         ${assets ? `<div class="wni-assets">${assets}</div>` : ''}
       </div>
       <div class="wni-money${low ? ' is-low' : ''}">${wniMoney(p.money)}<small>net ${wniMoney(wniNet(i))}</small></div>
@@ -573,12 +603,16 @@ function wniRenderTurn() {
 
 function wniRenderControls() {
   const humanTurn = !(WNI.isVsComputer && WNI.currentPlayer === 1);
+  const selectedMode = WNI.started || WNI.setupReady;
+  W.$setupHint.prop('hidden', WNI.started);
+  W.$start.prop('hidden', WNI.started || !WNI.setupReady);
   W.$roll.prop('disabled', !WNI.started || WNI.busy || WNI.gameOver || !humanTurn);
+  W.$roll.prop('hidden', !WNI.started);
   W.$reset.prop('disabled', !WNI.started);
   W.$pvp.add(W.$four).add(W.$ai).prop('disabled', WNI.started);
-  W.$pvp.attr('aria-pressed', String(WNI.started && !WNI.isVsComputer && WNI.playerCount === 2));
-  W.$four.attr('aria-pressed', String(WNI.started && !WNI.isVsComputer && WNI.playerCount === 4));
-  W.$ai.attr('aria-pressed', String(WNI.started && WNI.isVsComputer));
+  W.$pvp.attr('aria-pressed', String(selectedMode && !WNI.isVsComputer && WNI.playerCount === 2));
+  W.$four.attr('aria-pressed', String(selectedMode && !WNI.isVsComputer && WNI.playerCount === 4));
+  W.$ai.attr('aria-pressed', String(selectedMode && WNI.isVsComputer));
   W.$hint.toggleClass('is-hidden', WNI.started);
 }
 
@@ -1042,16 +1076,25 @@ function wniGameOver(winner, reason) {
 }
 
 /* -------------------------------------------------------------- lifecycle */
-function wniStart(vsComputer, playerCount = 2) {
+function wniPrepare(vsComputer, playerCount = 2) {
   wniResetState(playerCount);
   WNI.isVsComputer = vsComputer;
+  WNI.setupReady = true;
+  wniShowDice(0, 0);
+  W.$log.html('<div class="empty-note">Pilih ikon pemain, lalu mulai permainan.</div>');
+  wniRender();
+}
+
+function wniStart() {
+  if (!WNI.setupReady || WNI.started) return;
   WNI.started = true;
+  WNI.setupReady = false;
   wniShowDice(0, 0);
   W.$log.html('<div class="empty-note">Belum ada gerakan.</div>');
   wniRender();
-  const modeName = vsComputer ? 'Pemain 1 vs AI Tetangga' : `${playerCount} Pemain`;
+  const modeName = WNI.isVsComputer ? 'Pemain 1 vs AI Tetangga' : `${WNI.playerCount} Pemain`;
   wniLog('🧭', `Mode dimulai: <strong>${modeName}</strong>`, '', 'start');
-  toast(vsComputer ? '🤖 Lawan AI Tetangga. Semoga kuat!' : `👥 Mode ${playerCount} pemain dimulai!`);
+  toast(WNI.isVsComputer ? '🤖 Lawan AI Tetangga. Semoga kuat!' : `👥 Mode ${WNI.playerCount} pemain dimulai!`);
 }
 
 function wniReset() {
@@ -1067,11 +1110,24 @@ $(function () {
   wniShowDice(0, 0);
   if (!wniRestoreGame()) wniRender();
 
-  W.$pvp.on('click', () => wniStart(false));
-  W.$four.on('click', () => wniStart(false, 4));
-  W.$ai.on('click', () => wniStart(true));
+  W.$pvp.on('click', () => wniPrepare(false, 2));
+  W.$four.on('click', () => wniPrepare(false, 4));
+  W.$ai.on('click', () => wniPrepare(true));
+  W.$start.on('click', wniStart);
   W.$roll.on('click', wniPlayTurn);
   W.$reset.on('click', wniReset);
+  W.$players.on('click', '[data-wni-icon]', function () {
+    if (!WNI.setupReady || WNI.started) return;
+    const player = Number(this.dataset.player);
+    const icon = this.dataset.wniIcon;
+    if (!WNI.players[player] || !WNI_PLAYER_ICONS.includes(icon)) return;
+    if (WNI.selectedIcons.some((chosen, index) =>
+      index !== player && index < WNI.players.length &&
+      !(WNI.isVsComputer && index === 1) && chosen === icon)) return;
+    WNI.selectedIcons[player] = icon;
+    wniRenderPlayers();
+    wniRenderTokens();
+  });
   W.$players.on('click', '[data-wni-upgrade]', function () {
     wniRequestUpgrade(Number(this.dataset.player), Number(this.dataset.wniUpgrade));
   });

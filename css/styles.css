@@ -1448,6 +1448,33 @@ html[data-theme="dark"] .die {
 .wni-player[data-p="3"] { --c1: var(--p3-a); --c2: var(--p3-b); }
 .wni-player[data-p="4"] { --c1: var(--p4-a); --c2: var(--p4-b); }
 .wni-player .player-row__meta { display: flex; gap: 6px; align-items: center; }
+.wni-setup-hint { margin: 0 0 10px; color: var(--muted); font-size: 11px; }
+.wni-icon-picker { margin-top: 9px; }
+.wni-icon-picker__label { display: block; margin-bottom: 5px; color: var(--muted); font-size: 10px; font-weight: 700; }
+.wni-icon-picker__options { display: flex; flex-wrap: wrap; gap: 5px; }
+.wni-icon-picker__option {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  background: var(--surface-2);
+  font-size: 17px;
+  cursor: pointer;
+  transition: transform .18s var(--ease), border-color .18s ease, background .18s ease;
+}
+.wni-icon-picker__option:hover:not(:disabled) { transform: translateY(-2px); }
+.wni-icon-picker__option.is-selected {
+  border-color: var(--c1);
+  background: color-mix(in srgb, var(--c1) 24%, var(--surface-2));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--c1) 25%, transparent);
+}
+.wni-icon-picker__option:disabled { cursor: not-allowed; opacity: .32; }
+.wni-icon-picker__option:focus-visible { outline: 2px solid var(--c1); outline-offset: 2px; }
+.actions .btn[hidden] { display: none !important; }
 .wni-money {
   font-size: 16px;
   font-weight: 800;

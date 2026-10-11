@@ -204,6 +204,7 @@
 
       <section class="card players-card" aria-labelledby="wniPlayersTitle">
         <div class="card__head"><h2 class="card__title" id="wniPlayersTitle">Nasib WNI</h2></div>
+        <p class="wni-setup-hint" id="wniSetupHint">Pilih mode, atur ikon pemain, lalu mulai permainan.</p>
         <div class="players" id="wniPlayers"></div>
       </section>
 
@@ -223,6 +224,9 @@
 
       <section class="card actions-card" aria-label="Aksi permainan WNI">
         <div class="actions">
+          <button class="btn" id="wniStart" type="button" hidden>
+            <span aria-hidden="true">▶️</span> Mulai Permainan
+          </button>
           <button class="btn" id="wniRoll" type="button" disabled>
             <span aria-hidden="true">🎲</span> Lempar Dadu
             <span class="btn__key" aria-hidden="true">SPACE</span>
