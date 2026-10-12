@@ -1919,14 +1919,17 @@ html[data-game="wni"] .wni-layout {
   align-items: start;
 }
 html[data-game="wni"] .wni-layout > .stack { display: contents; }
-html[data-game="wni"] .wni-layout > .wni-card { grid-column: 1; grid-row: 1 / span 6; }
+html[data-game="wni"] .wni-layout > .wni-card { grid-column: 1; grid-row: 1 / span 5; }
 html[data-game="wni"] .wni-layout .mode-card { grid-column: 2; grid-row: 1; }
 html[data-game="wni"] .wni-layout .dice-card { grid-column: 2; grid-row: 2; }
 html[data-game="wni"] .wni-layout .actions-card { grid-column: 2; grid-row: 3; }
 html[data-game="wni"] .wni-layout .wni-status-card { grid-column: 2; grid-row: 4; }
-html[data-game="wni"] .wni-layout .guide-card { grid-column: 2; grid-row: 5; }
-html[data-game="wni"] .wni-layout .history-card { grid-column: 2; grid-row: 6; }
-html[data-game="wni"] .wni-layout .players-card { grid-column: 1 / -1; grid-row: 7; }
+html[data-game="wni"] .wni-layout .history-card { grid-column: 2; grid-row: 5; }
+html[data-game="wni"] .wni-layout .players-card { grid-column: 1 / -1; grid-row: 6; }
+html[data-game="wni"] .wni-layout .guide-card { grid-column: 1 / -1; grid-row: 7; }
+html[data-game="wni"] .wni-layout .guide-card .guide-content {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 html[data-game="wni"] #wniPlayers {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2034,15 +2037,17 @@ html[data-game="wni"] .wni-asset-card .wni-asset__upgrade:disabled { opacity: .5
   html[data-game="wni"] .wni-layout { grid-template-columns: minmax(0, 1fr); }
   html[data-game="wni"] .wni-layout > .wni-card { grid-column: 1; grid-row: 1; }
   html[data-game="wni"] .wni-layout .players-card { grid-column: 1; grid-row: 2; }
-  html[data-game="wni"] .wni-layout .mode-card { grid-column: 1; grid-row: 3; }
-  html[data-game="wni"] .wni-layout .dice-card { grid-column: 1; grid-row: 4; }
-  html[data-game="wni"] .wni-layout .actions-card { grid-column: 1; grid-row: 5; }
-  html[data-game="wni"] .wni-layout .wni-status-card { grid-column: 1; grid-row: 6; }
-  html[data-game="wni"] .wni-layout .guide-card { grid-column: 1; grid-row: 7; }
+  html[data-game="wni"] .wni-layout .guide-card { grid-column: 1; grid-row: 3; }
+  html[data-game="wni"] .wni-layout .mode-card { grid-column: 1; grid-row: 4; }
+  html[data-game="wni"] .wni-layout .dice-card { grid-column: 1; grid-row: 5; }
+  html[data-game="wni"] .wni-layout .actions-card { grid-column: 1; grid-row: 6; }
+  html[data-game="wni"] .wni-layout .wni-status-card { grid-column: 1; grid-row: 7; }
   html[data-game="wni"] .wni-layout .history-card { grid-column: 1; grid-row: 8; }
+  html[data-game="wni"] .wni-layout .guide-card .guide-content { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
   html[data-game="wni"] #wniPlayers { grid-template-columns: 1fr; }
+  html[data-game="wni"] .wni-layout .guide-card .guide-content { grid-template-columns: 1fr; }
   html[data-game="wni"] .wni-player-card__head { grid-template-columns: auto minmax(0, 1fr); }
   html[data-game="wni"] .wni-player-card__head .wni-money { grid-column: 1 / -1; text-align: left; }
 }
