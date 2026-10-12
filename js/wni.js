@@ -553,15 +553,21 @@ function wniRenderPlayers() {
       const level = wniUpgradeLevel(p, idx);
       const cost = wniUpgradeCost(idx);
       const canUpgrade = wniCanUpgrade(i, idx);
-      const levelLabel = level === WNI_CONFIG.MAX_PROPERTY_LEVEL ? 'Maks' : `Lv ${level}/${WNI_CONFIG.MAX_PROPERTY_LEVEL}`;
+      const levelLabel = level === WNI_CONFIG.MAX_PROPERTY_LEVEL ? 'Hotel' : `Bangunan ${level}/${WNI_CONFIG.MAX_PROPERTY_LEVEL}`;
+      const buildings = level === WNI_CONFIG.MAX_PROPERTY_LEVEL ? '🏨' : (level ? '🏠'.repeat(level) : 'Tanah');
       const upgradeAction = WNI.isVsComputer && i === 1
         ? ''
-        : `<button class="wni-asset__upgrade" type="button" data-wni-upgrade="${idx}" data-player="${i}" ${canUpgrade ? '' : 'disabled'} aria-label="${level === WNI_CONFIG.MAX_PROPERTY_LEVEL ? 'Tingkat upgrade maksimal' : `Upgrade ${tile.name} ke tingkat ${level + 1}, biaya ${wniMoney(cost)}`}">${level === WNI_CONFIG.MAX_PROPERTY_LEVEL ? 'Maks' : `⬆️ ${wniMoney(cost)}`}</button>`;
-      return `<span class="wni-asset">
-        <span>${tile.emoji} ${tile.name}</span>
-        <small>${levelLabel} · Sewa ${wniMoney(wniRent(idx, level))}</small>
+        : `<button class="wni-asset__upgrade" type="button" data-wni-upgrade="${idx}" data-player="${i}" ${canUpgrade ? '' : 'disabled'} aria-label="${level === WNI_CONFIG.MAX_PROPERTY_LEVEL ? 'Tingkat upgrade maksimal' : `Upgrade ${tile.name} ke tingkat ${level + 1}, biaya ${wniMoney(cost)}`}">${level === WNI_CONFIG.MAX_PROPERTY_LEVEL ? 'Maksimal' : `Upgrade · ${wniMoney(cost)}`}</button>`;
+      return `<article class="wni-asset-card" style="--asset-band:${['#e52620', '#31a956', '#8878bd', '#e8a94e'][idx % 4]}">
+        <div class="wni-asset-card__band">${tile.emoji} ${tile.name}</div>
+        <div class="wni-asset-card__building" aria-label="${levelLabel}">${buildings}</div>
+        <dl class="wni-asset-card__facts">
+          <div><dt>Harga</dt><dd>${wniMoney(tile.price)}</dd></div>
+          <div><dt>Sewa</dt><dd>${wniMoney(wniRent(idx, level))}</dd></div>
+          <div><dt>Status</dt><dd>${levelLabel}</dd></div>
+        </dl>
         ${upgradeAction}
-      </span>`;
+      </article>`;
     }).join('');
     const isHuman = !(WNI.isVsComputer && i === 1);
     const usedByOthers = WNI.selectedIcons.filter((_, index) =>
@@ -581,16 +587,21 @@ function wniRenderPlayers() {
           </div>
         </div>`
       : '';
-    return `<div class="player-row wni-player${active ? ' is-turn' : ''}" data-p="${i + 1}" style="--c1:${vars[0]};--c2:${vars[1]}">
-      <div class="player-row__avatar" aria-hidden="true">${wniIcon(i)}</div>
-      <div>
-        <div class="player-row__name">${wniName(i)}</div>
-        <div class="player-row__meta">${WNI.isVsComputer && i === 1 ? 'Komputer' : `Pemain ${i + 1}`} · ${p.detained ? '⏳ Ruang Tunggu' : `${WNI_TILES[p.pos].emoji} ${WNI_TILES[p.pos].name}`}${p.eliminated ? ' · Gugur' : ''}</div>
+    return `<article class="wni-player-card${active ? ' is-turn' : ''}" data-p="${i + 1}" style="--c1:${vars[0]};--c2:${vars[1]}">
+      <header class="wni-player-card__head">
+        <div class="player-row__avatar" aria-hidden="true">${wniIcon(i)}</div>
+        <div class="wni-player-card__identity">
+          <div class="player-row__name">${wniName(i)}</div>
+          <div class="player-row__meta">${WNI.isVsComputer && i === 1 ? 'Komputer' : `Pemain ${i + 1}`} · ${p.detained ? '⏳ Ruang Tunggu' : `${WNI_TILES[p.pos].emoji} ${WNI_TILES[p.pos].name}`}${p.eliminated ? ' · Gugur' : ''}</div>
+        </div>
+        <div class="wni-money${low ? ' is-low' : ''}">${wniMoney(p.money)}<small>Net ${wniMoney(wniNet(i))}</small></div>
+      </header>
+      <div class="wni-player-card__body">
         ${iconPicker}
-        ${assets ? `<div class="wni-assets">${assets}</div>` : ''}
+        <div class="wni-player-card__assets-title"><span>Kartu Aset</span><small>${p.props.length} properti</small></div>
+        ${assets ? `<div class="wni-assets">${assets}</div>` : '<div class="wni-assets-empty">Belum mempunyai aset.</div>'}
       </div>
-      <div class="wni-money${low ? ' is-low' : ''}">${wniMoney(p.money)}<small>net ${wniMoney(wniNet(i))}</small></div>
-    </div>`;
+    </article>`;
   }).join(''));
 }
 
@@ -849,6 +860,29 @@ function wniDrawCard(player, deck, deckName, logType) {
   wniPromptCard(WNI.pendingDecision);
 }
 
+function wniCardOutcomes(card, isDisaster) {
+  const value = Math.max(100000, Math.abs(card.delta));
+  const half = Math.round(value / 2 / 10000) * 10000;
+  const variant = [...card.title].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 4;
+  const money = (delta, label) => ({ text: `${label} ${wniMoney(Math.abs(delta))}`, delta });
+
+  if (isDisaster) {
+    return [
+      [money(-value, 'Tanggung kerugian'), money(-half, 'Bayar separuh'), { text: 'Lolos tanpa kerugian', delta: 0 }],
+      [{ text: 'Mundur 4 petak', delta: 0, move: -4 }, money(-half, 'Keluar biaya darurat'), { text: 'Bantuan datang · tanpa biaya', delta: 0 }],
+      [{ text: 'Masuk Ruang Tunggu', delta: 0, detain: true }, { text: 'Mundur 2 petak', delta: 0, move: -2 }, money(-half, 'Bayar biaya pemulihan')],
+      [money(-value, 'Kehilangan pemasukan'), { text: 'Mundur 3 petak', delta: 0, move: -3 }, money(Math.min(half, 250000), 'Dapat bantuan')]
+    ][variant].map((outcome, index) => ({ ...outcome, range: ['1–2', '3–4', '5–6'][index] }));
+  }
+
+  return [
+    [{ text: 'Mundur 3 petak', delta: 0, move: -3 }, money(half, 'Dapat'), money(value, 'Dapat penuh')],
+    [{ text: 'Belum beruntung · tanpa efek', delta: 0 }, { text: 'Maju 2 petak', delta: 0, move: 2 }, money(value, 'Dapat rezeki')],
+    [money(-Math.min(half, 200000), 'Bayar ongkos'), money(half, 'Dapat'), { text: 'Maju 4 petak', delta: 0, move: 4 }],
+    [{ text: 'Mundur 2 petak', delta: 0, move: -2 }, money(half, 'Dapat bantuan'), money(value + 100000, 'Dapat bonus')]
+  ][variant].map((outcome, index) => ({ ...outcome, range: ['1–2', '3–4', '5–6'][index] }));
+}
+
 function wniResumePendingDecision() {
   const decision = WNI.pendingDecision;
   if (!decision) return;
@@ -868,21 +902,10 @@ function wniPromptCard(decision) {
   const playerNameText = wniName(player);
   const autoApply = WNI.isVsComputer && player === 1;
   const isDisaster = deckName === 'Kartu Musibah';
-  const halfDelta = Math.round(card.delta / 2 / 10000) * 10000;
-  const outcomes = isDisaster
-    ? [
-        { range: '1–2', text: `Bayar ${wniMoney(Math.abs(card.delta))}`, delta: -Math.abs(card.delta) },
-        { range: '3–4', text: `Bayar separuh: ${wniMoney(Math.abs(halfDelta))}`, delta: -Math.abs(halfDelta) },
-        { range: '5–6', text: 'Lolos dari musibah · tanpa efek', delta: 0 }
-      ]
-    : [
-        { range: '1–2', text: 'Mundur 3 petak', delta: 0, move: -3 },
-        { range: '3–4', text: `${halfDelta < 0 ? 'Rugi' : 'Dapat'} ${wniMoney(Math.abs(halfDelta))}`, delta: halfDelta },
-        { range: '5–6', text: `${card.delta < 0 ? 'Rugi' : 'Dapat'} ${wniMoney(Math.abs(card.delta))}`, delta: card.delta }
-      ];
+  const outcomes = wniCardOutcomes(card, isDisaster);
   const outcomeIndex = cardDie <= 2 ? 0 : cardDie <= 4 ? 1 : 2;
   const outcome = outcomes[outcomeIndex];
-  const outcomeText = outcome.move ? outcome.text : outcome.delta === 0 ? 'Tanpa efek' : `${outcome.delta < 0 ? '−' : '+'}${wniMoney(Math.abs(outcome.delta))}`;
+  const outcomeText = outcome.text;
 
   const cardHtml = `<div class="wni-card-draw wni-card-draw--revealed">
     <div class="wni-card-draw__face" aria-hidden="true">${card.icon}</div>
@@ -936,6 +959,10 @@ function wniPromptCard(decision) {
     if (outcome.delta) wniChangeMoney(player, outcome.delta);
     if (outcome.move) {
       WNI.players[player].pos = (WNI.players[player].pos + WNI_CONFIG.TILE_COUNT + outcome.move) % WNI_CONFIG.TILE_COUNT;
+      wniRenderTokens(player);
+    }
+    if (outcome.detain) {
+      WNI.players[player].detained = true;
       wniRenderTokens(player);
     }
     wniLog(card.icon, `<strong>${playerNameText}</strong> menjalankan ${deckName}: ${card.title}`, `Dadu ${cardDie} · ${outcomeText}`, logType);

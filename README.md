@@ -96,9 +96,9 @@ php -S localhost:8080
 3. Setiap pemain memulai dengan **Rp10.000.000** dan bergantian melempar dua dadu.
 4. Saat melewati petak Mulai, pilih **Terima** untuk menerima **Rp500.000**, atau **Batal** untuk melanjutkan tanpa bonus.
 5. Saat mendarat di properti kosong, pemain dapat membeli properti. Pemain lain yang mendarat di sana membayar sewa kepada pemilik.
-6. Pemain dapat meng-upgrade properti miliknya kapan saja dari daftar aset: maksimal **3 tingkat**, tiap tingkat berbiaya **50% dari harga beli awal**, dan sewa menjadi **2× lipat per tingkat**. Upgrade menambah nilai aset bersih; bangunan ditandai di papan.
+6. Setiap pemain mempunyai kartu portofolio di bawah papan. Tiap aset ditampilkan sebagai kartu properti tersendiri berisi harga, sewa, status bangunan, serta tombol upgrade. Properti dapat dibangun maksimal **3 tingkat**, tiap tingkat berbiaya **50% dari harga beli awal**, dan sewa menjadi **2× lipat per tingkat**.
 7. Papan WNI adalah perimeter persegi **10×10**: setiap sisi menampilkan 10 petak, termasuk empat sudut bersama (36 petak unik), sementara area tengah tetap terbuka. Jalur dimulai dari START di sudut kiri bawah, berjalan searah jarum jam, lalu kembali ke START.
-8. Kartu **Musibah** dan **Takdir** dipilih acak dan dibuka dengan animasi. Setiap kartu melempar satu dadu dan mewajibkan hasil **1–2**, **3–4**, atau **5–6**; efeknya dapat mengubah saldo atau membuat pemain mundur.
+8. Kartu **Musibah** dan **Takdir** dipilih acak dan dibuka dengan animasi. Setiap kejadian mempunyai kombinasi hasil **1–2**, **3–4**, atau **5–6** yang berbeda; efeknya dapat mengubah saldo, menggerakkan pemain maju/mundur, membebaskan pemain dari kerugian, atau memasukkannya ke Ruang Tunggu.
 9. Petak **Masuk Pengadilan** dan **PHK di Mana-mana** memindahkan token ke ruang tunggu berbentuk lingkaran di tengah papan. Token kembali ke jalur dan boleh bergerak saat giliran pemain berikutnya tiba.
 10. Saldo yang tidak cukup untuk membayar kewajiban menyebabkan pemain bangkrut dan gugur. Jika tersisa satu pemain, pemain itu menang.
 11. Permainan tidak memiliki batas putaran. Pemain terakhir yang belum bangkrut menjadi pemenang; saldo dan kekayaan bersih tetap ditampilkan sebagai informasi.
