@@ -1,7 +1,7 @@
 /**
  * WNI SIMULATOR
  * Mode boardgame satir roll-and-move: kelola dana bansos, beli aset,
- * hadapi Kartu Kesempatan/Dana Umum dan penyitaan aset oleh negara.
+ * hadapi Kartu Musibah/Takdir dan ruang tunggu kehidupan.
  */
 
 const WNI_CONFIG = {
@@ -25,38 +25,38 @@ const WNI_TILES = [
   { type: 'start',     name: 'Start · Kelurahan',  emoji: '🏁' },
   { type: 'property',  name: 'Warung Kopi',        emoji: '☕', price: 600000,  rent: 120000 },
   { type: 'property',  name: 'Kos-Kosan',          emoji: '🏠', price: 900000,  rent: 180000 },
-  { type: 'kesempatan', name: 'Kartu Kesempatan',   emoji: '🎴' },
+  { type: 'takdir', name: 'Kartu Takdir',            emoji: '✨' },
   { type: 'property',  name: 'Angkot',             emoji: '🚐', price: 750000,  rent: 150000 },
-  { type: 'dana-umum', name: 'Dana Umum',          emoji: '🏛️' },
+  { type: 'musibah', name: 'Kartu Musibah',          emoji: '⚡' },
   { type: 'property',  name: 'KRL Commuter',       emoji: '🚆', price: 1200000, rent: 240000 },
   { type: 'pajak',     name: 'Pajak & Retribusi',  emoji: '🧾' },
   { type: 'property',  name: 'Pasar Tradisional',  emoji: '🥬', price: 800000,  rent: 160000 },
   { type: 'property',  name: 'Warnet',             emoji: '🖥️', price: 700000,  rent: 140000 },
   { type: 'bebas',     name: 'Nongkrong Bebas',    emoji: '🛖' },
-  { type: 'kesempatan', name: 'Kartu Kesempatan',  emoji: '🎴' },
+  { type: 'takdir', name: 'Kartu Takdir',            emoji: '✨' },
   { type: 'property',  name: 'Toko Kelontong',     emoji: '🏪', price: 650000,  rent: 130000 },
   { type: 'property',  name: 'Laundry Kiloan',     emoji: '🧺', price: 850000,  rent: 170000 },
-  { type: 'dana-umum', name: 'Dana Umum',          emoji: '🏛️' },
+  { type: 'musibah', name: 'Kartu Musibah',          emoji: '⚡' },
   { type: 'property',  name: 'Kontrakan',          emoji: '🚪', price: 1000000, rent: 200000 },
-  { type: 'penyitaan', name: 'Sita Aset Negara',   emoji: '🚫' },
+  { type: 'tertahan', name: 'Masuk Pengadilan',      emoji: '⚖️' },
   { type: 'property',  name: 'Klinik 24 Jam',      emoji: '🏥', price: 1100000, rent: 220000 },
   { type: 'property',  name: 'Warung Tegal',       emoji: '🍛', price: 550000,  rent: 110000 },
-  { type: 'kesempatan', name: 'Kartu Kesempatan',  emoji: '🎴' },
+  { type: 'takdir', name: 'Kartu Takdir',            emoji: '✨' },
   ...[
     ['property', 'Kopdes Merah Putih', '🏘️'],
     ['property', 'Dapur MBG', '🍱'],
-    ['kesempatan', 'Kartu Kesempatan', '🎴'],
+    ['takdir', 'Kartu Takdir', '✨'],
     ['property', 'Pemasok Pangan', '🥬'],
-    ['dana-umum', 'Dana Umum', '🏛️'],
+    ['musibah', 'Kartu Musibah', '⚡'],
     ['property', 'Layanan Hukum', '⚖️'],
     ['pajak', 'Pajak Bertingkat', '🧾'],
     ['property', 'Pasar Desa', '🥕'],
-    ['kesempatan', 'Kartu Kesempatan', '🎴'],
+    ['takdir', 'Kartu Takdir', '✨'],
     ['property', 'Kontrakan Buruh', '🚪'],
-    ['dana-umum', 'Dana Umum', '🏛️'],
-    ['penyitaan', 'Sita Aset Negara', '🚫'],
+    ['musibah', 'Kartu Musibah', '⚡'],
+    ['tertahan', 'PHK di Mana-mana', '📉'],
     ['property', 'Koperasi Warga', '🏘️'],
-    ['dana-umum', 'Dana Umum', '🏛️'],
+    ['musibah', 'Kartu Musibah', '⚡'],
     ['property', 'Puskesmas Desa', '🏥'],
     ['pajak', 'Pajak & Iuran', '🧾']
   ].map(([type, name, emoji], index) => {
@@ -169,6 +169,7 @@ function wniResetState(playerCount = 2, clearSavedGame = true) {
     pos: 0,
     props: [],
     upgrades: {},
+    detained: false,
     eliminated: false
   }));
   WNI.log = [];
@@ -374,6 +375,7 @@ function wniRestoreGame() {
       pos: player.pos % WNI_CONFIG.TILE_COUNT,
       props,
       upgrades,
+      detained: player.detained === true,
       eliminated: player.eliminated === true
     };
   });
@@ -391,17 +393,18 @@ function wniRestoreGame() {
         pending.remaining >= 0 && pending.remaining <= 11) {
       WNI.pendingDecision = pending;
     } else if (pending.type === 'card' && pending.card) {
-      const isChance = pending.deckName === 'Kartu Kesempatan';
+      const isChance = pending.deckName === 'Kartu Takdir';
       const deck = isChance ? WNI_CHANCE_CARDS
-        : pending.deckName === 'Dana Umum' ? WNI_PUBLIC_FUND_CARDS : [];
+        : pending.deckName === 'Kartu Musibah' ? WNI_PUBLIC_FUND_CARDS : [];
       const card = deck.find((entry) => entry.title === pending.card.title);
       if (card) {
         WNI.pendingDecision = {
           type: 'card',
           player: pending.player,
           card,
-          deckName: isChance ? 'Kartu Kesempatan' : 'Dana Umum',
-          logType: isChance ? 'kesempatan' : 'dana-umum'
+          cardDie: Number.isInteger(pending.cardDie) ? pending.cardDie : Math.floor(Math.random() * 6) + 1,
+          deckName: isChance ? 'Kartu Takdir' : 'Kartu Musibah',
+          logType: isChance ? 'takdir' : 'musibah'
         };
       }
     } else if (pending.type === 'buy' && Number.isInteger(pending.idx) &&
@@ -454,6 +457,11 @@ function wniBuildBoard() {
     <div class="wni-center__title">WNI SIMULATOR</div>
     <div class="wni-center__sub">Bertahan hidup di tengah biaya hidup &amp; birokrasi +62</div>
     <div class="wni-center__stats" id="wniCenterStatus">Dana bansos menanti...</div>
+    <div class="wni-holding" id="wniHolding" aria-label="Ruang tunggu sementara">
+      <strong>RUANG TUNGGU</strong>
+      <span>Pengadilan · PHK</span>
+      <small>Tunggu sampai giliran berikutnya</small>
+    </div>
   </div>`;
 
   const propertyBands = ['#49a99b', '#e8a94e', '#8878bd', '#588eaa'];
@@ -494,9 +502,10 @@ function wniRenderTokens(movingPlayer = -1) {
     $t.toggle(WNI.players[player] !== undefined);
     if (WNI.players[player] === undefined) return;
     const pos = WNI.players[player].pos;
-    if ($t.attr('data-host') !== String(pos)) {
-      $('#wniTile' + pos).append($t);
-      $t.attr('data-host', pos);
+    const host = WNI.players[player].detained ? 'holding' : String(pos);
+    if ($t.attr('data-host') !== host) {
+      (host === 'holding' ? $('#wniHolding') : $('#wniTile' + pos)).append($t);
+      $t.attr('data-host', host);
     }
     $t.text(wniIcon(player));
     $t.css('background', `linear-gradient(140deg, ${wniVar(player)})`);
@@ -523,7 +532,7 @@ function wniRenderTokens(movingPlayer = -1) {
     $tile.attr('aria-label', `Petak ${idx + 1}: ${tile.name}${owner === undefined ? '' : `, milik Pemain ${owner + 1}, tingkat ${level}, sewa ${wniMoney(wniRent(idx, level))}`}`);
   });
   WNI.players.forEach((player, i) => {
-    $('#wniTile' + player.pos).addClass('is-here-' + i);
+    if (!player.detained) $('#wniTile' + player.pos).addClass('is-here-' + i);
     player.props.forEach((idx) => {
       const $tile = $('#wniTile' + idx);
       $tile.addClass('is-owned-' + i);
@@ -576,7 +585,7 @@ function wniRenderPlayers() {
       <div class="player-row__avatar" aria-hidden="true">${wniIcon(i)}</div>
       <div>
         <div class="player-row__name">${wniName(i)}</div>
-        <div class="player-row__meta">${WNI.isVsComputer && i === 1 ? 'Komputer' : `Pemain ${i + 1}`} · ${WNI_TILES[p.pos].emoji} ${WNI_TILES[p.pos].name}${p.eliminated ? ' · Gugur' : ''}</div>
+        <div class="player-row__meta">${WNI.isVsComputer && i === 1 ? 'Komputer' : `Pemain ${i + 1}`} · ${p.detained ? '⏳ Ruang Tunggu' : `${WNI_TILES[p.pos].emoji} ${WNI_TILES[p.pos].name}`}${p.eliminated ? ' · Gugur' : ''}</div>
         ${iconPicker}
         ${assets ? `<div class="wni-assets">${assets}</div>` : ''}
       </div>
@@ -706,6 +715,13 @@ function wniRollDice() {
 /* ------------------------------------------------------------------- flow */
 function wniPlayTurn() {
   if (!WNI.started || WNI.gameOver || WNI.busy) return;
+  const activePlayer = WNI.players[WNI.currentPlayer];
+  if (activePlayer.detained) {
+    activePlayer.detained = false;
+    wniLog('🚪', `<strong>${wniName(WNI.currentPlayer)}</strong> keluar dari ruang tunggu`, 'Boleh bergerak', 'self');
+    toast(`🚪 ${wniName(WNI.currentPlayer)} kembali ke jalur dan boleh bergerak.`);
+    wniRenderTokens();
+  }
   WNI.busy = true;
   wniRenderControls();
 
@@ -798,12 +814,12 @@ function wniResolveTile(player) {
     return wniAfterAction(player);
   }
 
-  if (tile.type === 'kesempatan') {
-    return wniDrawCard(player, WNI_CHANCE_CARDS, 'Kartu Kesempatan', 'kesempatan');
+  if (tile.type === 'takdir') {
+    return wniDrawCard(player, WNI_CHANCE_CARDS, 'Kartu Takdir', 'takdir');
   }
 
-  if (tile.type === 'dana-umum') {
-    return wniDrawCard(player, WNI_PUBLIC_FUND_CARDS, 'Dana Umum', 'dana-umum');
+  if (tile.type === 'musibah') {
+    return wniDrawCard(player, WNI_PUBLIC_FUND_CARDS, 'Kartu Musibah', 'musibah');
   }
 
   if (tile.type === 'pajak') {
@@ -813,20 +829,11 @@ function wniResolveTile(player) {
     return wniAfterAction(player);
   }
 
-  if (tile.type === 'penyitaan') {
-    if (p.props.length) {
-      let cheapest = p.props[0];
-      p.props.forEach((i) => { if (WNI_TILES[i].price < WNI_TILES[cheapest].price) cheapest = i; });
-      delete WNI.owners[cheapest];
-      delete p.upgrades[cheapest];
-      p.props = p.props.filter((i) => i !== cheapest);
-      toast(`🚫 Negara menyita ${WNI_TILES[cheapest].name}!`);
-      wniLog('🚫', `Negara sita <strong>${WNI_TILES[cheapest].name}</strong> milik ${wniName(player)}`, '', 'sita');
-    } else {
-      wniChangeMoney(player, -WNI_CONFIG.DENDA_SITA);
-      toast(`🚫 Tak ada aset, ${wniName(player)} didenda ${wniMoney(WNI_CONFIG.DENDA_SITA)}`);
-      wniLog('🚫', `${wniName(player)} didenda penyitaan`, '-' + wniMoney(WNI_CONFIG.DENDA_SITA), 'sita');
-    }
+  if (tile.type === 'tertahan') {
+    p.detained = true;
+    toast(`⏳ ${wniName(player)} masuk ruang tunggu karena ${tile.name}.`);
+    wniLog(tile.emoji, `<strong>${wniName(player)}</strong> tertahan: ${tile.name}`, 'Sampai giliran berikutnya', 'sita');
+    wniRenderTokens();
     return wniAfterAction(player);
   }
 
@@ -837,7 +844,7 @@ function wniResolveTile(player) {
 
 function wniDrawCard(player, deck, deckName, logType) {
   const card = wniPick(deck);
-  WNI.pendingDecision = { type: 'card', player, card, deckName, logType };
+  WNI.pendingDecision = { type: 'card', player, card, cardDie: Math.floor(Math.random() * 6) + 1, deckName, logType };
   wniRender();
   wniPromptCard(WNI.pendingDecision);
 }
@@ -857,19 +864,35 @@ function wniResumePendingDecision() {
 }
 
 function wniPromptCard(decision) {
-  const { player, card, deckName, logType } = decision;
-  const amount = Math.abs(card.delta);
-  const change = card.delta < 0 ? `−${wniMoney(amount)}` : `+${wniMoney(amount)}`;
+  const { player, card, deckName, logType, cardDie } = decision;
   const playerNameText = wniName(player);
   const autoApply = WNI.isVsComputer && player === 1;
+  const isDisaster = deckName === 'Kartu Musibah';
+  const halfDelta = Math.round(card.delta / 2 / 10000) * 10000;
+  const outcomes = isDisaster
+    ? [
+        { range: '1–2', text: `Bayar ${wniMoney(Math.abs(card.delta))}`, delta: -Math.abs(card.delta) },
+        { range: '3–4', text: `Bayar separuh: ${wniMoney(Math.abs(halfDelta))}`, delta: -Math.abs(halfDelta) },
+        { range: '5–6', text: 'Lolos dari musibah · tanpa efek', delta: 0 }
+      ]
+    : [
+        { range: '1–2', text: 'Mundur 3 petak', delta: 0, move: -3 },
+        { range: '3–4', text: `${halfDelta < 0 ? 'Rugi' : 'Dapat'} ${wniMoney(Math.abs(halfDelta))}`, delta: halfDelta },
+        { range: '5–6', text: `${card.delta < 0 ? 'Rugi' : 'Dapat'} ${wniMoney(Math.abs(card.delta))}`, delta: card.delta }
+      ];
+  const outcomeIndex = cardDie <= 2 ? 0 : cardDie <= 4 ? 1 : 2;
+  const outcome = outcomes[outcomeIndex];
+  const outcomeText = outcome.move ? outcome.text : outcome.delta === 0 ? 'Tanpa efek' : `${outcome.delta < 0 ? '−' : '+'}${wniMoney(Math.abs(outcome.delta))}`;
 
   const cardHtml = `<div class="wni-card-draw wni-card-draw--revealed">
     <div class="wni-card-draw__face" aria-hidden="true">${card.icon}</div>
     <strong class="wni-card-draw__title">${card.title}</strong>
     <p>${card.text}</p>
-    <span class="wni-card-draw__amount${card.delta < 0 ? ' is-loss' : ''}">${change} jika diterima</span>
-    <small>Terima untuk menjalankan efek kartu. Batal untuk melewati kartu tanpa perubahan saldo.</small>
-    ${autoApply ? '<small>Efek kartu diterapkan otomatis untuk AI.</small>' : ''}
+    <div class="wni-card-outcomes">
+      ${outcomes.map((item, index) => `<div class="${index === outcomeIndex ? 'is-result' : ''}"><b>${item.range}</b><span>${item.text}</span></div>`).join('')}
+    </div>
+    <span class="wni-card-draw__amount${outcome.delta < 0 || outcome.move ? ' is-loss' : ''}">🎲 Dadu kartu: ${cardDie} · ${outcomeText}</span>
+    ${autoApply ? '<small>Hasil diterapkan otomatis untuk AI.</small>' : '<small>Efek kartu wajib dijalankan.</small>'}
     <small>Skenario fiktif untuk permainan; tidak merujuk pada orang atau perkara tertentu.</small>
   </div>`;
   const revealDelay = WNI.reduceMotion ? 0 : 1150;
@@ -899,9 +922,8 @@ function wniPromptCard(decision) {
           title: `${card.icon} ${deckName}`,
           html: cardHtml,
           showConfirmButton: !autoApply,
-          showCancelButton: !autoApply,
-          confirmButtonText: 'Terima',
-          cancelButtonText: 'Batal'
+          showCancelButton: false,
+          confirmButtonText: 'Jalankan efek'
         });
         if (autoApply) {
           setTimeout(() => {
@@ -911,14 +933,13 @@ function wniPromptCard(decision) {
       }, revealDelay);
     }
   }).then((result) => {
-    if (autoApply || result.isConfirmed) {
-      wniChangeMoney(player, card.delta);
-      wniLog(card.icon, `<strong>${playerNameText}</strong> menerima ${deckName}: ${card.title}`, change, logType);
-      toast(`${card.icon} ${playerNameText}: ${card.title} (${change})`);
-    } else {
-      wniLog('↩️', `<strong>${playerNameText}</strong> membatalkan ${deckName}: ${card.title}`, 'Tanpa efek', 'skip');
-      toast(`↩️ Kartu dibatalkan. Saldo ${playerNameText} tidak berubah.`);
+    if (outcome.delta) wniChangeMoney(player, outcome.delta);
+    if (outcome.move) {
+      WNI.players[player].pos = (WNI.players[player].pos + WNI_CONFIG.TILE_COUNT + outcome.move) % WNI_CONFIG.TILE_COUNT;
+      wniRenderTokens(player);
     }
+    wniLog(card.icon, `<strong>${playerNameText}</strong> menjalankan ${deckName}: ${card.title}`, `Dadu ${cardDie} · ${outcomeText}`, logType);
+    toast(`${card.icon} ${playerNameText}: dadu ${cardDie}, ${outcomeText}`);
     WNI.pendingDecision = null;
     wniRender();
     wniAfterAction(player);

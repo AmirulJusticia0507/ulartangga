@@ -109,7 +109,7 @@ Game engine WNI Simulator:
 - `WNI`: State independen untuk pemain, saldo, aset, giliran, dan putaran.
 - `wniBuildBoard()`: Generate jalur melingkar 20 petak pada grid 6×6.
 - `wniPlayTurn()` / `wniMove()`: Lempar dadu dan gerakkan token di jalur.
-- `wniResolveTile()`: Beli properti, bayar sewa/pajak, tarik kartu, atau hadapi penyitaan.
+- `wniResolveTile()`: Beli properti, bayar sewa/pajak, tarik Kartu Musibah/Takdir, atau masuk ruang tunggu.
 - `wniNextTurn()` / `wniGameOver()`: AI, batas 8 putaran, bangkrut, dan pemenang.
 
 #### main.js
