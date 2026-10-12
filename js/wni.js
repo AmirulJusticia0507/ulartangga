@@ -140,7 +140,7 @@ const WNI_PUBLIC_FUND_CARDS = [
 /* ------------------------------------------------------------------ state */
 const WNI = {
   reduceMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-  selectedIcons: ['🧑', '👩', '🧑‍🚀', '🚴'],
+  selectedIcons: ['🧑', '👩', '🧑‍🚀', '🚴', '👨‍💼'],
   setupReady: false
 };
 
@@ -195,7 +195,9 @@ const W = {
   $roll: $('#wniRoll'),
   $reset: $('#wniReset'),
   $pvp: $('#wniPvpMode'),
+  $three: $('#wniThreeMode'),
   $four: $('#wniFourMode'),
+  $five: $('#wniFiveMode'),
   $ai: $('#wniAiMode'),
   $turnBadge: $('#wniTurnBadge'),
   $turnName: $('#wniTurnName'),
@@ -228,7 +230,8 @@ function wniVar(i) {
     'var(--p1-a), var(--p1-b)',
     'var(--p2-a), var(--p2-b)',
     'var(--p3-a), var(--p3-b)',
-    'var(--p4-a), var(--p4-b)'
+    'var(--p4-a), var(--p4-b)',
+    'var(--p5-a), var(--p5-b)'
   ][i];
 }
 function wniNet(i) {
@@ -328,7 +331,7 @@ function wniRestoreGame() {
   }
 
   if (!saved || saved.version !== 1 || saved.started !== true ||
-      ![2, 4].includes(saved.playerCount) || !Array.isArray(saved.players) ||
+      ![2, 3, 4, 5].includes(saved.playerCount) || !Array.isArray(saved.players) ||
       saved.players.length !== saved.playerCount ||
       !saved.players.every((player) => player &&
         Number.isFinite(player.money) &&
@@ -344,10 +347,10 @@ function wniRestoreGame() {
     saved.players.filter((player) => !player.eliminated).length <= 1;
   WNI.isVsComputer = saved.isVsComputer === true;
   WNI.playerCount = saved.playerCount;
-  WNI.selectedIcons = Array.from({ length: 4 }, (_, index) =>
+  WNI.selectedIcons = Array.from({ length: 5 }, (_, index) =>
     WNI_PLAYER_ICONS.includes(saved.selectedIcons?.[index])
       ? saved.selectedIcons[index]
-      : ['🧑', '👩', '🧑‍🚀', '🚴'][index]);
+      : ['🧑', '👩', '🧑‍🚀', '🚴', '👨‍💼'][index]);
   WNI.currentPlayer = Number.isInteger(saved.currentPlayer) &&
     saved.currentPlayer >= 0 && saved.currentPlayer < saved.playerCount ? saved.currentPlayer : 0;
   WNI.turnCount = Number.isInteger(saved.turnCount) && saved.turnCount >= 0 ? saved.turnCount : 0;
@@ -488,7 +491,7 @@ function wniBuildBoard() {
     </div>`;
   });
 
-  html += ['🧑', '👩', '🧑‍🚀', '🚴'].map((icon, i) =>
+  html += ['🧑', '👩', '🧑‍🚀', '🚴', '👨‍💼'].map((icon, i) =>
     `<div class="wni-token wni-token--${i}" id="wniToken${i}" aria-hidden="true">${icon}</div>`
   ).join('');
 
@@ -517,7 +520,7 @@ function wniRenderTokens(movingPlayer = -1) {
     $t.toggleClass('is-turn', WNI.started && !WNI.gameOver && player === WNI.currentPlayer);
   });
   W.$board.find('.wni-tile')
-    .removeClass('is-here-0 is-here-1 is-here-2 is-here-3 is-owned-0 is-owned-1 is-owned-2 is-owned-3 is-upgraded-1 is-upgraded-2 is-upgraded-3');
+    .removeClass('is-here-0 is-here-1 is-here-2 is-here-3 is-here-4 is-owned-0 is-owned-1 is-owned-2 is-owned-3 is-owned-4 is-upgraded-1 is-upgraded-2 is-upgraded-3');
   W.$board.find('.wni-tile__owner').text('');
   WNI_TILES.forEach((tile, idx) => {
     if (tile.type !== 'property') return;
@@ -664,9 +667,11 @@ function wniRenderControls() {
   W.$roll.prop('disabled', !WNI.started || WNI.busy || WNI.gameOver || !humanTurn);
   W.$roll.prop('hidden', !WNI.started);
   W.$reset.prop('disabled', !WNI.started);
-  W.$pvp.add(W.$four).add(W.$ai).prop('disabled', WNI.started);
+  W.$pvp.add(W.$three).add(W.$four).add(W.$five).add(W.$ai).prop('disabled', WNI.started);
   W.$pvp.attr('aria-pressed', String(selectedMode && !WNI.isVsComputer && WNI.playerCount === 2));
+  W.$three.attr('aria-pressed', String(selectedMode && !WNI.isVsComputer && WNI.playerCount === 3));
   W.$four.attr('aria-pressed', String(selectedMode && !WNI.isVsComputer && WNI.playerCount === 4));
+  W.$five.attr('aria-pressed', String(selectedMode && !WNI.isVsComputer && WNI.playerCount === 5));
   W.$ai.attr('aria-pressed', String(selectedMode && WNI.isVsComputer));
   W.$hint.toggleClass('is-hidden', WNI.started);
 }
@@ -1210,7 +1215,9 @@ $(function () {
   if (!wniRestoreGame()) wniRender();
 
   W.$pvp.on('click', () => wniPrepare(false, 2));
+  W.$three.on('click', () => wniPrepare(false, 3));
   W.$four.on('click', () => wniPrepare(false, 4));
+  W.$five.on('click', () => wniPrepare(false, 5));
   W.$ai.on('click', () => wniPrepare(true));
   W.$start.on('click', wniStart);
   W.$roll.on('click', wniPlayTurn);

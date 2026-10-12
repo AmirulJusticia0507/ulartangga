@@ -1,7 +1,7 @@
 # 🎲 Game Ular Tangga (Snake 'n Ladder)
 
 Permainan web dengan dua mode yang dapat ditukar dari tombol di header: Ular Tangga dan
-WNI Simulator. Keduanya mendukung 2 atau 4 pemain lokal, serta permainan melawan AI.
+WNI Simulator. Ular Tangga mendukung 2 atau 4 pemain lokal; WNI Simulator mendukung 2–5 pemain lokal. Keduanya juga menyediakan permainan melawan AI.
 
 Proyek ini statis — tanpa build step, tanpa backend. Cukup buka `index.html` di browser.
 
@@ -91,7 +91,7 @@ php -S localhost:8080
 
 ## 🇮🇩 Aturan Main — WNI Simulator
 
-1. Gunakan tombol **WNI Simulator** di header, lalu pilih **2 Pemain**, **4 Pemain**, atau **Vs AI**.
+1. Gunakan tombol **WNI Simulator** di header, lalu pilih **2**, **3**, **4**, atau **5 Pemain**, maupun **Vs AI**.
 2. Sebelum mulai, setiap pemain manusia dapat memilih ikon karakter yang berbeda. Tekan **Mulai Permainan** setelah memilih ikon; ikon tetap tersimpan saat progres permainan dipulihkan.
 3. Setiap pemain memulai dengan **Rp10.000.000** dan bergantian melempar dua dadu.
 4. Saat melewati petak Mulai, pilih **Terima** untuk menerima **Rp500.000**, atau **Batal** untuk melanjutkan tanpa bonus.
