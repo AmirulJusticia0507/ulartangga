@@ -287,6 +287,21 @@ button { font-family: inherit; }
 
 .stack { display: grid; gap: clamp(12px, 1.6vw, 16px); }
 
+/* kolom utama: papan + card tambahan di bawahnya */
+.main-col {
+  display: grid;
+  gap: clamp(12px, 1.6vw, 16px);
+  align-content: start;
+  min-width: 0;
+}
+.board-extra {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(12px, 1.6vw, 16px);
+  align-items: start;
+}
+.board-extra > .card { padding: clamp(15px, 1.65vw, 20px); }
+
 /* ============================================================
    GUIDE CARD
    ============================================================ */
@@ -1308,7 +1323,7 @@ html[data-theme="dark"] .die {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: stretch;
   }
-  .mode-card, .actions-card, .guide-card, .leaderboard-card, .history-card, .wni-status-card { grid-column: 1 / -1; }
+  .mode-card, .actions-card, .history-card, .wni-status-card { grid-column: 1 / -1; }
   .players-card, .dice-card { min-width: 0; }
 }
 
@@ -1329,6 +1344,8 @@ html[data-theme="dark"] .die {
   .board { border-radius: 19px; }
   .stack { gap: 10px; }
   .stack > .card { padding: 13px; }
+  .board-extra { grid-template-columns: 1fr; }
+  .board-extra > .card { padding: 13px; }
   .card__head { margin-bottom: 12px; }
   .players { gap: 7px; }
   .player-row { grid-template-columns: 34px minmax(0, 1fr) auto; gap: 8px; padding: 9px; }

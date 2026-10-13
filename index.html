@@ -41,6 +41,7 @@
 
   <main id="mainContent">
   <div class="layout" id="snakeView">
+    <div class="main-col">
     <section class="card board-card" aria-labelledby="boardTitle">
       <div class="card__head">
         <h2 class="card__title" id="boardTitle">Papan Main</h2>
@@ -63,51 +64,7 @@
       </div>
     </section>
 
-    <aside class="stack" aria-label="Kontrol permainan dan informasi">
-      <section class="card mode-card" aria-labelledby="modeTitle">
-        <div class="card__head"><h2 class="card__title" id="modeTitle">Pilih mode</h2></div>
-        <div class="segmented" role="group" aria-label="Mode permainan">
-          <button type="button" id="pvpMode" aria-pressed="false">
-            <span aria-hidden="true">👥</span> 2 Pemain
-          </button>
-          <button type="button" id="fourPlayersMode" aria-pressed="false">
-            <span aria-hidden="true">👥</span> 4 Pemain
-          </button>
-          <button type="button" id="vsComputer" aria-pressed="false">
-            <span aria-hidden="true">🤖</span> Vs AI
-          </button>
-        </div>
-      </section>
-
-      <section class="card players-card" aria-labelledby="playersTitle">
-        <div class="card__head"><h2 class="card__title" id="playersTitle">Pemain</h2></div>
-        <div class="players" id="players"></div>
-      </section>
-
-      <section class="card dice-card" aria-labelledby="diceTitle">
-        <div class="card__head"><h2 class="card__title" id="diceTitle">Lemparan</h2></div>
-        <div class="dice-area">
-          <div class="dice-pair" aria-label="Hasil dadu">
-            <div class="die is-idle" id="die1" role="img" aria-label="Dadu pertama"></div>
-            <div class="die is-idle" id="die2" role="img" aria-label="Dadu kedua"></div>
-          </div>
-          <div class="dice-total">
-            <div class="dice-total__value" id="totalDice" aria-live="polite">—</div>
-            <div class="dice-total__label">Total</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card actions-card" aria-label="Aksi permainan">
-        <div class="actions">
-          <button class="btn" id="rollDice" type="button" disabled>
-            <span aria-hidden="true">🎲</span> Lempar Dadu
-            <span class="btn__key" aria-hidden="true">SPACE</span>
-          </button>
-          <button class="btn btn--ghost" id="resetGame" type="button" aria-label="Reset permainan">🔄</button>
-        </div>
-      </section>
-
+    <div class="board-extra">
       <section class="card guide-card" aria-labelledby="guideTitle">
         <div class="card__head"><h2 class="card__title" id="guideTitle">🎮 Petunjuk</h2></div>
         <div class="guide-content">
@@ -152,6 +109,53 @@
       <section class="card leaderboard-card" aria-labelledby="leaderboardTitle">
         <div class="card__head"><h2 class="card__title" id="leaderboardTitle">🏆 Leaderboard</h2></div>
         <div class="rank-list" id="leaderboardList"></div>
+      </section>
+    </div>
+    </div>
+
+    <aside class="stack" aria-label="Kontrol permainan dan informasi">
+      <section class="card mode-card" aria-labelledby="modeTitle">
+        <div class="card__head"><h2 class="card__title" id="modeTitle">Pilih mode</h2></div>
+        <div class="segmented" role="group" aria-label="Mode permainan">
+          <button type="button" id="pvpMode" aria-pressed="false">
+            <span aria-hidden="true">👥</span> 2 Pemain
+          </button>
+          <button type="button" id="fourPlayersMode" aria-pressed="false">
+            <span aria-hidden="true">👥</span> 4 Pemain
+          </button>
+          <button type="button" id="vsComputer" aria-pressed="false">
+            <span aria-hidden="true">🤖</span> Vs AI
+          </button>
+        </div>
+      </section>
+
+      <section class="card players-card" aria-labelledby="playersTitle">
+        <div class="card__head"><h2 class="card__title" id="playersTitle">Pemain</h2></div>
+        <div class="players" id="players"></div>
+      </section>
+
+      <section class="card dice-card" aria-labelledby="diceTitle">
+        <div class="card__head"><h2 class="card__title" id="diceTitle">Lemparan</h2></div>
+        <div class="dice-area">
+          <div class="dice-pair" aria-label="Hasil dadu">
+            <div class="die is-idle" id="die1" role="img" aria-label="Dadu pertama"></div>
+            <div class="die is-idle" id="die2" role="img" aria-label="Dadu kedua"></div>
+          </div>
+          <div class="dice-total">
+            <div class="dice-total__value" id="totalDice" aria-live="polite">—</div>
+            <div class="dice-total__label">Total</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card actions-card" aria-label="Aksi permainan">
+        <div class="actions">
+          <button class="btn" id="rollDice" type="button" disabled>
+            <span aria-hidden="true">🎲</span> Lempar Dadu
+            <span class="btn__key" aria-hidden="true">SPACE</span>
+          </button>
+          <button class="btn btn--ghost" id="resetGame" type="button" aria-label="Reset permainan">🔄</button>
+        </div>
       </section>
 
       <section class="card history-card" aria-labelledby="historyTitle">
