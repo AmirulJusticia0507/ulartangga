@@ -13,6 +13,9 @@ const CONFIG = {
   STEP_MS: 260,
   AI_DELAY: 900,
 
+  // Feedback - endpoint KiloCode CLI penerima masukan dari footer
+  KILOCODE_CLI_URL: 'http://localhost:4317/kilocode',
+
   // Entities - Ular
   SNAKES: {
     99: 54,

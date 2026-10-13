@@ -5,6 +5,17 @@ WNI Simulator. Ular Tangga mendukung 2 atau 4 pemain lokal; WNI Simulator menduk
 
 Proyek ini statis — tanpa build step, tanpa backend. Cukup buka `index.html` di browser.
 
+Fitur **kirim masukan** di footer mengirim POST JSON ke KiloCode CLI. Jalankan CLI
+di terminal terpisah agar masukan diterima:
+
+```bash
+node kilocode-cli.js        # listen di http://localhost:4317
+node kilocode-cli.js --port 8080
+```
+
+CLI mencetak setiap masukan ke terminal dan menyimpannya ke `kilocode-inbox.jsonl`.
+Jika CLI tidak berjalan, footer menampilkan toast "Gagal kirim".
+
 ---
 
 ## 📋 Daftar Isi
@@ -41,6 +52,7 @@ Proyek ini statis — tanpa build step, tanpa backend. Cukup buka `index.html` d
 | 🎉 **Konfeti + modal kemenangan** | Efek konfeti dan modal beri tema yang senada dengan tema halaman. |
 | 📱 **Responsif** | Papan mengikuti lebar container, selalu persegi, dan tidak pernah overflow — dari 320px sampai layar lebar. |
 | 🔀 **Switch game** | Berpindah antara Ular Tangga dan WNI Simulator tanpa memuat ulang halaman. |
+| 📤 **Kirim masukan** | Form di footer mengirim masukan sebagai POST JSON ke KiloCode CLI (`node kilocode-cli.js`). |
 | 🇮🇩 **WNI Simulator** | Papan keliling seperti board game dengan 10 petak per sisi, ekonomi bansos, properti/sewa, Kartu Musibah dan Takdir, ruang tunggu, AI, dan permainan sampai tersisa satu pemain. |
 
 ---
@@ -156,9 +168,11 @@ ulartangga/
 │   ├── dice.js             # Logika & animasi dadu
 │   ├── game.js             # Engine permainan
 │   ├── wni.js              # Papan keliling 36 petak, ekonomi, kartu, AI, dan game flow WNI
+│   ├── feedback.js         # Form masukan footer → POST ke KiloCode CLI
 │   └── main.js             # Event handler & inisialisasi
 ├── ular.png                # Aset gambar kepala ular
 ├── tangga.png              # Aset gambar tangga
+├── kilocode-cli.js         # CLI penerima masukan dari footer (node kilocode-cli.js)
 ├── PROJECT_STRUCTURE.md    # Dokumentasi detail tiap file
 └── README.md               # Dokumen ini
 ```

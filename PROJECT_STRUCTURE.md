@@ -19,9 +19,11 @@ ulartangga/
 │   ├── dice.js             # Dice logic & animation
 │   ├── game.js             # Game engine & logic
 │   ├── wni.js              # Board loop, state ekonomi, kartu, dan AI WNI Simulator
+│   ├── feedback.js         # Form masukan footer → POST ke KiloCode CLI
 │   └── main.js             # Event handlers & initialization
 ├── ular.png                # Asset gambar ular
-└── tangga.png              # Asset gambar tangga
+├── tangga.png              # Asset gambar tangga
+└── kilocode-cli.js         # CLI penerima POST masukan dari footer
 ```
 
 ## Deskripsi File
@@ -112,6 +114,11 @@ Game engine WNI Simulator:
 - `wniResolveTile()`: Beli properti, bayar sewa/pajak, tarik Kartu Musibah/Takdir, atau masuk ruang tunggu.
 - `wniNextTurn()` / `wniGameOver()`: AI, batas 8 putaran, bangkrut, dan pemenang.
 
+#### feedback.js
+Form masukan di footer:
+- `Feedback.init()`: Pasang submit handler pada `#feedbackForm`.
+- `Feedback.submit()`: Validasi teks, kirim POST JSON ke `CONFIG.KILOCODE_CLI_URL`, tampilkan toast hasil.
+
 #### main.js
 Event handlers & initialization:
 - Switch antara tampilan Ular Tangga dan WNI Simulator tanpa reload.
@@ -120,10 +127,15 @@ Event handlers & initialization:
 - Window resize handler untuk menggambar ulang SVG Ular Tangga.
 - Inisialisasi Ular Tangga dan state view awal.
 
+### kilocode-cli.js (Node CLI)
+- Server HTTP kecil yang menerima POST `/kilocode` dari form footer.
+- Mencetak masukan ke terminal dan menyimpannya ke `kilocode-inbox.jsonl`.
+- Jalankan dengan `node kilocode-cli.js` (opsional `--port`).
+
 ## Load Order
 
 Script harus diload dengan urutan ini (sudah benar di index.html):
-1. config.js → 2. state.js → 3. utils.js → 4. board.js → 5. render.js → 6. dice.js → 7. game.js → 8. wni.js → 9. main.js
+1. config.js → 2. state.js → 3. utils.js → 4. board.js → 5. render.js → 6. dice.js → 7. game.js → 8. wni.js → 9. feedback.js → 10. main.js
 
 Ini penting karena setiap module bergantung pada yang sebelumnya.
 

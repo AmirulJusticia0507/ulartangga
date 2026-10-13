@@ -1009,6 +1009,64 @@ html[data-theme="dark"] .die {
   background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
 }
 
+/* feedback form - kirim masukan ke KiloCode CLI */
+.feedback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 480px;
+  margin: 0 auto 10px;
+}
+.feedback__input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--pill);
+  backdrop-filter: blur(12px);
+  transition: border-color var(--dur) ease, background var(--dur) ease,
+              box-shadow var(--dur) ease;
+}
+.feedback__input::placeholder { color: var(--muted); opacity: .75; }
+.feedback__input:focus {
+  outline: none;
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  box-shadow: var(--shadow-sm);
+}
+.feedback__send {
+  height: 40px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  background: linear-gradient(115deg, var(--p1-a), var(--gold-b));
+  border: none;
+  border-radius: var(--pill);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform var(--dur) var(--ease), filter var(--dur) ease;
+}
+.feedback__send:hover:not(:disabled) { filter: brightness(1.07); transform: translateY(-1px); }
+.feedback__send:active:not(:disabled) { transform: scale(.96); }
+.feedback__send:disabled { opacity: .55; cursor: default; }
+.app-footer__note { margin-top: 4px; }
+
+@media (max-width: 560px) {
+  .feedback { flex-wrap: wrap; }
+  .feedback__input { flex-basis: 100%; text-align: center; }
+}
+
 /* toast */
 .toast {
   position: fixed;

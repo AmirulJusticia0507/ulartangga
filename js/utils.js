@@ -25,6 +25,9 @@ const DOM = {
   $boardHint: $('#boardHint'),
   $turnBadge: $('#turnBadge'),
   $turnName: $('#turnName'),
+  $feedbackForm: $('#feedbackForm'),
+  $feedbackInput: $('#feedbackInput'),
+  $feedbackSend: $('#feedbackSend'),
 
   $cell: (n) => $(`#cell${n}`),
   $token: (i) => $(`#token${i}`)

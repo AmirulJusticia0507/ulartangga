@@ -308,7 +308,16 @@
   </div>
   </main>
 
-  <footer class="app-footer">© 2025 Amirul Putra Justicia <span aria-hidden="true">·</span> Snake ’n Ladder &amp; WNI Simulator</footer>
+  <footer class="app-footer">
+    <form class="feedback" id="feedbackForm" autocomplete="off">
+      <input class="feedback__input" id="feedbackInput" type="text" maxlength="280"
+             placeholder="Kirim masukan ke KiloCode CLI…" aria-label="Masukan untuk KiloCode CLI">
+      <button class="feedback__send" id="feedbackSend" type="submit" aria-label="Kirim masukan ke KiloCode CLI">
+        <span aria-hidden="true">📤</span> Kirim
+      </button>
+    </form>
+    <p class="app-footer__note">© 2025 Amirul Putra Justicia <span aria-hidden="true">·</span> Snake ’n Ladder &amp; WNI Simulator</p>
+  </footer>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -322,6 +331,7 @@
 <script src="js/dice.js"></script>
 <script src="js/game.js"></script>
 <script src="js/wni.js"></script>
+<script src="js/feedback.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
